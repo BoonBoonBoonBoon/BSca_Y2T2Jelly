@@ -27,7 +27,7 @@ public:
 	float RunSpeed; 
 	// ... Character X Axis Turn Speed
 	float TurnSpeed;
-
+	
 	/** Boolean Checks **/
 
 	// ... Checks if Running.
@@ -40,15 +40,16 @@ public:
 	// ... For Characters Max speed with consumables. 
 	float RunSpeedPickup;
 
-	/** Jump Variables **/
 	
 	// ... Max Avg JumpHeight.
 	float JumpHeight; 
 
-	/** Crouch Variables **/
-
 	// ... CrouchSpeed.
 	float CrouchSpeed;
+
+	float CamClamp;
+
+
 
 	// Creates StaticMeshComp.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MeshComp")
@@ -61,6 +62,9 @@ public:
 	// Creates Cam (Used for viewport distance)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraProp")
 		class UCameraComponent* CameraComp; 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CamManager")
+		class APlayerController* PlayerControl;
 
 
 
@@ -79,11 +83,13 @@ private:
 	void EndCrouch();
 
 
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	void CameraClamp();
 	
 private:
 

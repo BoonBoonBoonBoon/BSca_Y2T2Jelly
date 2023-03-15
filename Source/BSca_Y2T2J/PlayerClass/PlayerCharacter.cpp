@@ -9,6 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework\PlayerController.h"
+#include "Camera\PlayerCameraManager.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -32,16 +34,42 @@ APlayerCharacter::APlayerCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 
 	// Camera Lag Speed
-	SpringArmComp->bEnableCameraLag = 50.f;
-	SpringArmComp->bEnableCameraRotationLag = 50.f;
+	SpringArmComp->bEnableCameraLag = true;
+	SpringArmComp->bEnableCameraRotationLag = true;
+	SpringArmComp->CameraLagSpeed = 4.f;
+	SpringArmComp->CameraRotationLagSpeed = 4.f;
+
+
+	/** 
+	* if True. Rotatoes the pitch and yaw of the body
+	* to match controller input 
+	* Pitch Transforms the body off the ground.*/
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+
+	// Yaw Rotates the body.
+	bUseControllerRotationYaw = true;
 	
 	/** Set Absoulte is opposite of Set relative
 	* @see SetRelative
 	* Works to ignore parent, means that it is absolute and will not change
-	* otherwise specifed. 
-	*/
-	SpringArmComp->SetUsingAbsoluteRotation(true);
-	SpringArmComp->TargetArmLength = 500.f;
+	* otherwise specifed. */
+	SpringArmComp->SetUsingAbsoluteRotation(false);
+	SpringArmComp->TargetArmLength = 300.f;
+
+	// Maintains relative rotation to the parent
+	SpringArmComp->bUsePawnControlRotation = true;
+	SpringArmComp->SetRelativeRotation(FRotator(0.f, 0.f, 100.f));
+	SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+
+	// Checks for collision
+	SpringArmComp->bDoCollisionTest = true;
+
+	// Checks if it should use the view/cont rotation of pawn
+	CameraComp->bUsePawnControlRotation = false;
+
+	//GetCharacterMovement()->bOrientRotationToMovement = true;
+	//GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 0.f);
 
 	// Movement Values
 	WalkSpeedAvg = 500.f;
@@ -49,7 +77,7 @@ APlayerCharacter::APlayerCharacter()
 	// (Temp) 
 	RunSpeedTemp = 1200.f;
 	// XAxis turn Speed
-	TurnSpeed;
+	TurnSpeed = 1.f;
 
 	// Pickup Values
 	RunSpeedPickup = 2000.f;
@@ -64,7 +92,7 @@ APlayerCharacter::APlayerCharacter()
 	bIsRunning = false; 
 	bIsJumping = false;
 	
-
+	
 }
 
 void APlayerCharacter::MoveVer(float Value)
@@ -124,16 +152,23 @@ void APlayerCharacter::StartJump()
 
 void APlayerCharacter::Run()
 {
+	/** Character changes to walkspeed when calling sprint method while its crouching
+	* @see RunEnd method.
+	*
+	**/
 
-	bIsRunning = true;
+	if (!bIsCrouched && bIsRunning) 
+	{
+		//bIsRunning = true;
 
-	// Access MWS AChar var, assign RunSpeed data.
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed; 
+		// Access MWS AChar var, assign RunSpeed data.
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 
-	if (bIsCrouched) {
+	} else if (bIsCrouched && !bIsRunning) 
+	{
 
 		APlayerCharacter::StartCrouch();
-		RunEnd();
+		//RunEnd();
 
 	}
 	
@@ -183,6 +218,11 @@ void APlayerCharacter::EndCrouch()
 {
 
 	//bIsCrouched = false;
+	
+
+
+
+
 
 	if (!bIsCrouched) 
 	{
@@ -206,7 +246,24 @@ void APlayerCharacter::EndCrouch()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	// DOCCUMENT FOR TOMORROW WEBSITE
 	
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController)
+	{
+		if (PlayerController->PlayerCameraManager)
+		{
+			PlayerController->PlayerCameraManager->ViewPitchMin = -50.0;
+			PlayerController->PlayerCameraManager->ViewPitchMax = 50.0;
+		}
+	} 
+
+}
+
+void APlayerCharacter::CameraClamp()
+{
 }
 
 // Called every frame
@@ -230,8 +287,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	/** Use of APawn since the method AddCYI is not a Construct of APlayerChar
 	* Apawn used to reference the premade method
 	* @see LookPitch */
-	PlayerInputComponent->BindAxis("LookYaw", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookPitch", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Look Yaw", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Look Pitch", this, &APawn::AddControllerPitchInput);
 
 	// ... Jumping Input Control
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
