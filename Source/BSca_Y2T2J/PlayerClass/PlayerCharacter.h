@@ -35,6 +35,7 @@ public:
 	// ... Checks if jumping.
 	bool bIsJumping;
 
+
 	/** Pickup Variables **/
 
 	// ... For Characters Max speed with consumables. 
@@ -71,6 +72,7 @@ private:
 	void MoveHor(float Value);
 
 	void StartJump();
+	void JumpEnd();
 
 	void Run();
 	void RunEnd();

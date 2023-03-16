@@ -134,18 +134,16 @@ void APlayerCharacter::StartJump()
 	* @see JumpZ
 	* If false return AChar SJ Method 
 	*/
-	bIsJumping = true;
+	GetCharacterMovement()->JumpZVelocity = 600.f;
+	Jump();
+		
 
-	if (bIsJumping) 
-	{
-		Jump();
-		GetCharacterMovement()->JumpZVelocity = 600.f;
-	}
-	else 
-	{
-		StopJumping();
-	}
+}
 
+void APlayerCharacter::JumpEnd()
+{
+	StopJumping();
+	
 }
 
 
@@ -156,21 +154,20 @@ void APlayerCharacter::Run()
 	*
 	**/
 
-	if (!bIsCrouched && bIsRunning) 
-	{
-		//bIsRunning = true;
+	bIsRunning = true;
 
-		// Access MWS AChar var, assign RunSpeed data.
+	if (bIsRunning) {
+
 		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 
-	} else if (bIsCrouched && !bIsRunning) 
-	{
-
-		APlayerCharacter::StartCrouch();
-		//RunEnd();
-
 	}
+	else 
+	{
+		RunEnd();
+	}
+
 	
+
 }
 
 void APlayerCharacter::RunEnd()
@@ -178,50 +175,37 @@ void APlayerCharacter::RunEnd()
 
 	bIsRunning = false;
 
-	/**
-	* MWS is AChar,
-	* accessor needs to access class variables.
-	* WSA Then used as temp data storage. 
-	*/
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
+	if (!bIsRunning) {
+		/**
+		* MWS is AChar,
+		* accessor needs to access class variables.
+		* WSA Then used as temp data storage.
+		*/
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
+	}
+	else {
+		Run();
+	}
 }
 
 void APlayerCharacter::StartCrouch()
 {
-
-	GetCapsuleComponent()->SetCapsuleHalfHeight(48.f);
-
 	bIsCrouched = true;
-	bIsRunning = false;
-
-	if (bIsCrouched) 
-	{
-		GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
-		APlayerCharacter::RunSpeed = CrouchSpeed;
-	}
-	else if (bIsCrouched && !bIsRunning)
-	{
+	if (bIsCrouched) {
+		GetCharacterMovement()->SetJumpAllowed(false);
 		
+
+		GetCapsuleComponent()->SetCapsuleHalfHeight(48.f);
 		GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
 		APlayerCharacter::RunSpeed = CrouchSpeed;
-		APlayerCharacter::WalkSpeedAvg = CrouchSpeed;
-
 	}
-	else if (!bIsCrouched) 
-	{
-		APlayerCharacter::EndCrouch();
-	}
+	
 }
 
 void APlayerCharacter::EndCrouch()
 {
 
 	//bIsCrouched = false;
-	
-
-
-
-
 
 	if (!bIsCrouched) 
 	{
@@ -291,7 +275,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	// ... Jumping Input Control
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::JumpEnd);
 
 	// ... Running Input Control
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APlayerCharacter::Run);
