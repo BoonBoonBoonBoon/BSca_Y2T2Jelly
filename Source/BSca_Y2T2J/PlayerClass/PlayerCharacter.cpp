@@ -68,8 +68,7 @@ APlayerCharacter::APlayerCharacter()
 	// Checks if it should use the view/cont rotation of pawn
 	CameraComp->bUsePawnControlRotation = false;
 
-	//GetCharacterMovement()->bOrientRotationToMovement = true;
-	//GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, -80.f, 0.f);
 
 	// Movement Values
 	WalkSpeedAvg = 500.f;
@@ -77,7 +76,7 @@ APlayerCharacter::APlayerCharacter()
 	// (Temp) 
 	RunSpeedTemp = 1200.f;
 	// XAxis turn Speed
-	TurnSpeed = 1.f;
+	TurnSpeed = 0.5f;
 
 	// Pickup Values
 	RunSpeedPickup = 2000.f;
@@ -255,11 +254,11 @@ void APlayerCharacter::BeginPlay()
 	{
 		if (PlayerController->PlayerCameraManager)
 		{
-			PlayerController->PlayerCameraManager->ViewPitchMin = -50.0;
-			PlayerController->PlayerCameraManager->ViewPitchMax = 50.0;
+			PlayerController->PlayerCameraManager->ViewPitchMin = -30.0;
+			PlayerController->PlayerCameraManager->ViewPitchMax = 30.0;
 		}
 	} 
-
+	
 }
 
 void APlayerCharacter::CameraClamp()

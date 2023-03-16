@@ -47,8 +47,6 @@ public:
 	// ... CrouchSpeed.
 	float CrouchSpeed;
 
-	float CamClamp;
-
 
 
 	// Creates StaticMeshComp.
@@ -63,8 +61,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraProp")
 		class UCameraComponent* CameraComp; 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CamManager")
-		class APlayerController* PlayerControl;
 
 
 
