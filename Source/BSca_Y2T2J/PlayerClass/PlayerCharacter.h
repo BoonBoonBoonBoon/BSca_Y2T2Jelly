@@ -22,11 +22,15 @@ public:
 	// ... RunSpeed (TEMP) to hold temparate speed infomation. 
 	float RunSpeedTemp;
 	// ... WalkSpeed Avg (TEMP).
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float WalkSpeedAvg;
 	// ... For the Max character speed.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float RunSpeed; 
 	// ... Character X Axis Turn Speed
 	float TurnSpeed;
+	
+
 	
 	/** Boolean Checks **/
 
@@ -40,12 +44,16 @@ public:
 
 	// ... For Characters Max speed with consumables. 
 	float RunSpeedPickup;
+	float JumpHeightPickup;
+
 
 	
 	// ... Max Avg JumpHeight.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float JumpHeight; 
 
 	// ... CrouchSpeed.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float CrouchSpeed;
 
 
@@ -71,9 +79,11 @@ private:
 	void MoveVer(float Value);
 	void MoveHor(float Value);
 
+	UFUNCTION(BlueprintCallable)
 	void StartJump();
 	void JumpEnd();
 
+	UFUNCTION(BlueprintCallable)
 	void Run();
 	void RunEnd();
 

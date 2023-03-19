@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Health\HealthComponent.h"
 #include "GameFramework\PlayerController.h"
 #include "Camera\PlayerCameraManager.h"
 
@@ -39,16 +40,6 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->CameraLagSpeed = 4.f;
 	SpringArmComp->CameraRotationLagSpeed = 4.f;
 
-
-	/** 
-	* if True. Rotatoes the pitch and yaw of the body
-	* to match controller input 
-	* Pitch Transforms the body off the ground.*/
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = false;
-
-	// Yaw Rotates the body.
-	bUseControllerRotationYaw = true;
 	
 	/** Set Absoulte is opposite of Set relative
 	* @see SetRelative
@@ -56,6 +47,18 @@ APlayerCharacter::APlayerCharacter()
 	* otherwise specifed. */
 	SpringArmComp->SetUsingAbsoluteRotation(false);
 	SpringArmComp->TargetArmLength = 300.f;
+
+
+	/**
+	* if True. Rotatoes the pitch and yaw of the body
+	* to match controller input
+	* Pitch Transforms the body off the ground.*/
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+
+	// Yaw Rotates the body.
+	bUseControllerRotationYaw = true;
+
 
 	// Maintains relative rotation to the parent
 	SpringArmComp->bUsePawnControlRotation = true;
@@ -66,7 +69,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->bDoCollisionTest = true;
 
 	// Checks if it should use the view/cont rotation of pawn
-	CameraComp->bUsePawnControlRotation = false;
+	// CameraComp->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, -80.f, 0.f);
 
@@ -80,12 +83,14 @@ APlayerCharacter::APlayerCharacter()
 
 	// Pickup Values
 	RunSpeedPickup = 2000.f;
+	JumpHeightPickup = 1000.f;
+
 
 	// Crouch Values
 	CrouchSpeed = 250.f;
 
 	// Jumping Values
-	JumpHeight = 250.f;
+	JumpHeight = 600.f;
 
 	// Boolean Values
 	bIsRunning = false; 
@@ -134,7 +139,7 @@ void APlayerCharacter::StartJump()
 	* @see JumpZ
 	* If false return AChar SJ Method 
 	*/
-	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->JumpZVelocity = JumpHeight;
 	Jump();
 		
 
@@ -205,7 +210,7 @@ void APlayerCharacter::StartCrouch()
 void APlayerCharacter::EndCrouch()
 {
 
-	//bIsCrouched = false;
+	bIsCrouched = false;
 
 	if (!bIsCrouched) 
 	{
@@ -213,7 +218,7 @@ void APlayerCharacter::EndCrouch()
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
 		APlayerCharacter::RunSpeed = RunSpeedTemp;
 		APlayerCharacter::UnCrouch();
-
+		GetCharacterMovement()->SetJumpAllowed(true);
 	}
 	else if (bIsCrouched)
 	{
