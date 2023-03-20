@@ -72,6 +72,9 @@ public:
 
 
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Run();
+	void RunEnd();
 
 
 private:
@@ -83,9 +86,6 @@ private:
 	void StartJump();
 	void JumpEnd();
 
-	UFUNCTION(BlueprintCallable)
-	void Run();
-	void RunEnd();
 
 	void StartCrouch();
 	void EndCrouch();

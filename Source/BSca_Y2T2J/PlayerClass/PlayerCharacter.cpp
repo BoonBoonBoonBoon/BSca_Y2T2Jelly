@@ -3,6 +3,7 @@
 
 #include "PlayerClass/PlayerCharacter.h"
 #include "GameFramework/Character.h"
+#include "GameFramework\Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"

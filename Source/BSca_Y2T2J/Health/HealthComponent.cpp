@@ -3,6 +3,7 @@
 
 #include "Health/HealthComponent.h"
 #include "Components\ProgressBar.h"
+#include "PlayerClass\PlayerCharacter.h"
 #include "Pickups\PickUpBase.h" 
 
 // Sets default values for this component's properties
