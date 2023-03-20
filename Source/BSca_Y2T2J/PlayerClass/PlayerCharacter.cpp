@@ -13,6 +13,7 @@
 #include "Health\HealthComponent.h"
 #include "GameFramework\PlayerController.h"
 #include "Camera\PlayerCameraManager.h"
+#include "Stamina\StaminaComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -97,7 +98,6 @@ APlayerCharacter::APlayerCharacter()
 	bIsRunning = false; 
 	bIsJumping = false;
 	
-	
 }
 
 void APlayerCharacter::MoveVer(float Value)
@@ -160,12 +160,14 @@ void APlayerCharacter::Run()
 	*
 	**/
 
+	//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
+
 	bIsRunning = true;
 
 	if (bIsRunning) {
 
 		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-
+		//StaminaComp->StaminaDrain();
 	}
 	else 
 	{

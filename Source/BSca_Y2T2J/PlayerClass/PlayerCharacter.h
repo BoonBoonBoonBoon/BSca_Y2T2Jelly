@@ -39,7 +39,6 @@ public:
 	// ... Checks if jumping.
 	bool bIsJumping;
 
-
 	/** Pickup Variables **/
 
 	// ... For Characters Max speed with consumables. 
@@ -70,6 +69,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraProp")
 		class UCameraComponent* CameraComp; 
 
+	UPROPERTY(VisibleAnywhere)
+	class UStaminaComponent* StaminaComp;
 
 
 	UFUNCTION(BlueprintCallable)

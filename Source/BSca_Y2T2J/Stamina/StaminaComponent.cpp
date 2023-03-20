@@ -31,12 +31,9 @@ void UStaminaComponent::BeginPlay()
 	* we are using GetOwner(), then it’s because the class we are writing in is an ActorComponent, a component to be added to an actor, not the actor itself. 
 	*/
 
-
-	AActor* Owner = GetOwner();
-	Owner->OnInputTouchBegin.AddDynamic(this, &UStaminaComponent::StaminaDrain);
-
+	// https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
 	
-	
+	// See paper - Timer Manager - GetTimerManager() - Onstamina Event
 }
 
 
