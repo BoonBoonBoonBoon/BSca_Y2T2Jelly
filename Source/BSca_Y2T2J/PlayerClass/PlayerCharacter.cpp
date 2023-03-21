@@ -15,6 +15,10 @@
 #include "Camera\PlayerCameraManager.h"
 #include "Stamina\StaminaComponent.h"
 
+// Defines an Alias. Macro for reusablity.
+#define UsePrintString(String) GEngine->AddOnScreenDebugMessage(-1.f, 150.f, FColor::White, String );
+
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -30,6 +34,9 @@ APlayerCharacter::APlayerCharacter()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(("HealthComp"));
+	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(("StaminaComp"));
 
 	/** Attached Subobjects */
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -61,13 +68,10 @@ APlayerCharacter::APlayerCharacter()
 	// Yaw Rotates the body.
 	bUseControllerRotationYaw = true;
 
-
 	// Maintains relative rotation to the parent
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetRelativeRotation(FRotator(0.f, 0.f, 100.f));
 	SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-
-	// Checks for collision
 	SpringArmComp->bDoCollisionTest = true;
 
 	// Checks if it should use the view/cont rotation of pawn
@@ -97,6 +101,11 @@ APlayerCharacter::APlayerCharacter()
 	// Boolean Values
 	bIsRunning = false; 
 	bIsJumping = false;
+
+	// @See Idle
+	bShouldRotate = false;
+	RotationRate = 90.f;
+	
 	
 }
 
@@ -152,6 +161,41 @@ void APlayerCharacter::JumpEnd()
 	
 }
 
+
+void APlayerCharacter::OnStaminaUse_Implementation()
+{
+}
+
+void APlayerCharacter::CameraSpin_Implementation()
+{
+	AActor* MyOwner = GetOwner();
+	SpringArmComp = Cast<USpringArmComponent>(MyOwner);
+	FRotator CameraRotation;
+	CameraRotation = SpringArmComp->GetComponentRotation();
+	
+
+	
+
+}
+
+void APlayerCharacter::Idle()
+{
+	// @See TimerFunction
+	/** SetTimer First Set TimerHandle.
+	* this. Context Actor for location.
+	* Grab timer method.
+	* inRate how often it shows on screen
+	* Checks if loop
+	* firs delay
+	*/
+	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
+
+	//GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Check"))
+
+	
+	
+
+}
 
 void APlayerCharacter::Run()
 {
@@ -239,6 +283,10 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 
+	
+
+
+
 	// DOCCUMENT FOR TOMORROW WEBSITE
 	
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -253,14 +301,29 @@ void APlayerCharacter::BeginPlay()
 	
 }
 
-void APlayerCharacter::CameraClamp()
-{
-}
-
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void APlayerCharacter::TimerFunction()
+{
+
+	CallTracker--;
+	
+	if(CallTracker == 0)
+	{
+
+		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
+		GetWorldTimerManager().ClearTimer(TimerHandle);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));
+
+	}
 
 }
 

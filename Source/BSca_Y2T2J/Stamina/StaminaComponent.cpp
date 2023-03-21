@@ -34,6 +34,11 @@ void UStaminaComponent::BeginPlay()
 	// https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
 	
 	// See paper - Timer Manager - GetTimerManager() - Onstamina Event
+
+	//APlayerCharacter* Owner;
+	//Owner->OnStaminaUse_Implementation.AddDynamic(this, &UStaminaComponent::StaminaDrain);
+
+
 }
 
 
@@ -43,6 +48,14 @@ void UStaminaComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UStaminaComponent::StaminaIncrease(float StaminaRed, AActor* StaminaCauser, AController* InstigatedBy, APlayerCharacter* Run)
+{
+
+	//FTimerManager()
+
+
 }
 
 void UStaminaComponent::StaminaDrain(float StaminaRed, AActor* StaminaCauser, AController* InstigatedBy, APlayerCharacter* Run)
@@ -63,4 +76,5 @@ void UStaminaComponent::StaminaDrain(float StaminaRed, AActor* StaminaCauser, AC
 
 
 }
+
 

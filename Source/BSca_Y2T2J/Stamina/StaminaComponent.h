@@ -26,6 +26,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+		void StaminaIncrease(float StaminaRed, AActor* StaminaCauser, AController* InstigatedBy, APlayerCharacter* Run);
 
 	UFUNCTION()
 	void StaminaDrain(float StaminaRed, AActor* StaminaCauser, AController* InstigatedBy, APlayerCharacter* Run);
@@ -36,6 +38,8 @@ public:
 	UPROPERTY(blueprintReadWrite, Category = "Stamina")
 		float Stamina;
 		
-	
+	UPROPERTY(BlueprintReadWrite)
+		bool bIsMoving;
 
+	
 };

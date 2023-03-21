@@ -34,10 +34,12 @@ void UHealthComponent::BeginPlay()
 	* @see takedamage
 	*/
 
-	AActor* Owner = GetOwner(); // ... Get reference to owning actor,
+	// Get reference to owning actor,
+	AActor* Owner = GetOwner(); 
 	if (Owner)
 	{
-		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage); // ... Valid owner returned, whenever takedamage function called, add dynamic binding. 
+		// Valid owner returned, whenever takedamage function called, add dynamic binding. 
+		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage); 
 	}
 
 	

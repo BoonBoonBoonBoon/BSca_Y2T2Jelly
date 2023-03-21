@@ -55,10 +55,8 @@ void APickUpBase::Tick(float DeltaTime)
 	* AddDynamic (Delegates) binds a function and an event (overlap event)
 	* Calls for the Function.*/
 
-	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &APickUpBase::OnOverlapBegin);
-	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &APickUpBase::OnOverlapEnd);
 
-	/** 
+	/**
 	* Checks if the Rotate bool is true
 	* Return RootComp location to Rotation var
 	* Get the Y axis of FR roation plus Rotation Rate
@@ -66,6 +64,11 @@ void APickUpBase::Tick(float DeltaTime)
 	* Set Rotation just updates the new location every second
 	*/
 
+	// Delegates Event to Function
+	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &APickUpBase::OnOverlapBegin);
+	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &APickUpBase::OnOverlapEnd);
+
+	// Multiplies the Yaw rotation of item by every tick. 
 	if (bRotate)
 	{
 		FRotator Rotation = GetActorRotation();
