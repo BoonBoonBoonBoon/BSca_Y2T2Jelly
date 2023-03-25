@@ -3,6 +3,7 @@
 
 #include "Health/HealthComponent.h"
 #include "Components\ProgressBar.h"
+//#include "Weapons\ProjectileBase.cpp"
 #include "PlayerClass\PlayerCharacter.h"
 #include "Pickups\PickUpBase.h" 
 
@@ -54,9 +55,8 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
-void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-
 	/**
 	* @See Health
 	* On TakeDamage Health is given the data,
@@ -78,6 +78,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	* Then minus it from health.
 	*/
 
+
 	if (Damage <= 0)
 	{
 		return;		// ... Checking if take damage. 
@@ -86,9 +87,15 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
 
-
-
-
-
 }
 
+//Regen = 20.f;
+
+	//Health = FMath::Clamp(Health + Regen, 0.0f, DefaultHealth);
+
+void UHealthComponent::IncreaseHealthWidget()
+{
+
+	
+
+}

@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapons/ProjectileBase.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
+
 
 UCLASS()
 class BSCA_Y2T2J_API APlayerCharacter : public ACharacter
@@ -12,6 +15,7 @@ class BSCA_Y2T2J_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 		class UCharacterMovementComponent;
+
 
 public:
 	// Sets default values for this character's properties
@@ -75,16 +79,28 @@ public:
 
 
 
-	/** 
-	* Can be used both in C and Bp 
-	* BlueprintNativeEvent you WILL NEED to define _Implementation function
-	*/
+	// Custom Event to Update player health to the health widget.
+	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
+		void IncreaseHealth();
+		void IncreaseHealth_Implementation();
+
+
+	// Ptr to increase health method
+	UPROPERTY()
+		UHealthComponent* IncreaseHealthPtr;
+
+
+
+
+	// Custom Event to update player stamina to the stamina widget
 	UFUNCTION(BlueprintNativeEvent, Category = "OnStaminaUse")
 		void OnStaminaUse();
 		void OnStaminaUse_Implementation();
 
 
-	// Camera Spin
+
+
+	// Camera Spin.... 
 	UFUNCTION(BlueprintNativeEvent, Category = "CameraSpin")
 		void CameraSpin();
 		void CameraSpin_Implementation();
@@ -95,6 +111,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void Idle();
+
+
+	void OnInteract(AProjectileBase* ProjectileActor);
 
 
 	UFUNCTION(BlueprintCallable)

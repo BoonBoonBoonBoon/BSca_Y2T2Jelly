@@ -14,6 +14,7 @@
 #include "GameFramework\PlayerController.h"
 #include "Camera\PlayerCameraManager.h"
 #include "Stamina\StaminaComponent.h"
+#include "Weapons/ProjectileBase.h"
 
 // Defines an Alias. Macro for reusablity.
 #define UsePrintString(String) GEngine->AddOnScreenDebugMessage(-1.f, 150.f, FColor::White, String );
@@ -149,6 +150,7 @@ void APlayerCharacter::StartJump()
 	* @see JumpZ
 	* If false return AChar SJ Method 
 	*/
+
 	GetCharacterMovement()->JumpZVelocity = JumpHeight;
 	Jump();
 		
@@ -162,20 +164,47 @@ void APlayerCharacter::JumpEnd()
 }
 
 
+
+void APlayerCharacter::IncreaseHealth_Implementation()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
+	
+	//IncreaseHealthPtr = Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+
+	// Engine Crashes 
+	
+	//IncreaseHealthPtr->Regen = 20.f;
+	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
+	
+	//Engine Crashes
+	
+	//IncreaseHealthPtr->IncreaseHealthWidget();
+	
+
+
+}
+
+
+
+
+
 void APlayerCharacter::OnStaminaUse_Implementation()
 {
 }
 
 void APlayerCharacter::CameraSpin_Implementation()
 {
-	AActor* MyOwner = GetOwner();
-	SpringArmComp = Cast<USpringArmComponent>(MyOwner);
-	FRotator CameraRotation;
-	CameraRotation = SpringArmComp->GetComponentRotation();
-	
 
-	
+	// Get Help for Cam Spins
+	// @See Idle 
 
+	//AActor* MyOwner = GetOwner();
+	//SpringArmComp = Cast<USpringArmComponent>(MyOwner);
+	//FRotator CameraRotation;
+	//CameraRotation = SpringArmComp->GetComponentRotation();
+	
 }
 
 void APlayerCharacter::Idle()
@@ -189,13 +218,33 @@ void APlayerCharacter::Idle()
 	* firs delay
 	*/
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
+}
 
-	//GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Check"))
+void APlayerCharacter::OnInteract(AProjectileBase* ProjectileActor)
+{
 
-	
-	
+	AProjectileBase* BulletPtr;
+
+	if (BulletPtr != nullptr) {
+
+		BulletPtr = GetWorld()
+		
+	}
+
+	/**
+	Want to spawn actor -
+	to spawn actor we need to give it a location to spawn.
+	could use getworld maybe or a body part of the actor.
+
+	onactorhit destroy
+	FHitResult
+
+	https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Actors/Spawning/
+	*/
 
 }
+
+
 
 void APlayerCharacter::Run()
 {
@@ -283,9 +332,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 
+	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
 	
-
-
 
 	// DOCCUMENT FOR TOMORROW WEBSITE
 	
@@ -310,6 +358,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 void APlayerCharacter::TimerFunction()
 {
+
+	// Timer Handle for Camera Rotation
+
 
 	CallTracker--;
 	
@@ -355,8 +406,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// ... Crouch Input Control
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::StartCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
-	//PlayerInputComponent->BindAction("Crouch", IE_Repeat, this, &APlayerCharacter::StartCrouch);
-	
+
+	// Fire
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
 
 }
 

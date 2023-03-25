@@ -12,6 +12,8 @@ class BSCA_Y2T2J_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+		class USphereComponent;
+
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
@@ -38,5 +40,8 @@ public:
 
 	UFUNCTION() // ... Dynamic binding
 		void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-		
+
+	void IncreaseHealthWidget();
+	float Regen;
+
 };

@@ -4,6 +4,8 @@
 #include "Pickups/PickUpBase.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Pickups\PickupHealth.h"
+#include "Health\HealthComponent.h"
 
 // Sets default values
 APickUpBase::APickUpBase()
@@ -36,10 +38,6 @@ APickUpBase::APickUpBase()
 void APickUpBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-
-	
-
 
 
 }
@@ -83,18 +81,14 @@ void APickUpBase::Tick(float DeltaTime)
 void APickUpBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
+		UE_LOG(LogTemp, Warning, TEXT("Base Pickup"));
+		Destroy();
 	
-
-	UE_LOG(LogTemp, Warning, TEXT("Object Hit"));
-	Destroy();
-
 
 }
 
 void APickUpBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
-	UE_LOG(LogTemp, Warning, TEXT("Object Pickup"));
 
 }
 

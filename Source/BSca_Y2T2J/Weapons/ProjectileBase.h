@@ -4,32 +4,36 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PickUpBase.generated.h"
+#include "ProjectileBase.generated.h"
 
 UCLASS()
-class BSCA_Y2T2J_API APickUpBase : public AActor
+class BSCA_Y2T2J_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APickUpBase();
-	
+	AProjectileBase();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
 		class USkeletalMeshComponent* SkeletalMesh;
 
 
 	// Creates Sphere
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionVol")
-		class USphereComponent* CollisionVol;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
+		class USphereComponent* CollisionBody;
+
+	// HealthComp Cast
+	class UHealthComponent* HealthCompPtr;
+
+	AProjectileBase* ProjectilePtr;
+
+	int Owner;
+
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
-	float RotationRate;
-	bool bRotate;
-
 
 public:	
 	// Called every frame
@@ -43,7 +47,7 @@ public:
 	// End Overlap Function
 	UFUNCTION()
 		virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) ;
 
 
 
