@@ -23,12 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
 		class USphereComponent* CollisionBody;
 
-	// HealthComp Cast
-	class UHealthComponent* HealthCompPtr;
-
 	AProjectileBase* ProjectilePtr;
-
-	int Owner;
 
 
 protected:

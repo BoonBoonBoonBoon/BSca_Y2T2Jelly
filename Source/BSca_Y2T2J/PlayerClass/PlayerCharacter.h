@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Weapons/ProjectileBase.h"
+#include "Health\HealthComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
@@ -42,19 +43,6 @@ public:
 
 
 
-
-
-	// RunSpeed (TEMP) to hold temparate speed infomation. 
-	float RunSpeedTemp;
-
-	// WalkSpeed Avg (TEMP).
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float WalkSpeedAvg;
-
-	// For the Max character speed.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float RunSpeed; 
-
 	// Character X Axis Turn Speed
 	float TurnSpeed;
 
@@ -68,6 +56,22 @@ public:
 	float RunSpeedPickup;
 	float JumpHeightPickup;
 
+	// RunSpeed (TEMP) to hold temparate speed infomation. 
+	float RunSpeedTemp;
+
+	// WalkSpeed Avg (TEMP).
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float WalkSpeedAvg;
+
+	// For the Max character speed.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float RunSpeed; 
+
+	
+
+	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
+		bool bShouldRotate;
+	float RotationRate;
 
 	// Max Avg JumpHeight.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -78,18 +82,24 @@ public:
 		float CrouchSpeed;
 
 
+	UFUNCTION(BlueprintCallable)
+		virtual void Run();
+		void RunEnd();
+
+
+	UFUNCTION(BlueprintCallable)
+		void Idle();
+
+
+	UFUNCTION()
+		void InteractPressed();
+		float bullets;
+
 
 	// Custom Event to Update player health to the health widget.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
 		void IncreaseHealth();
 		void IncreaseHealth_Implementation();
-
-
-	// Ptr to increase health method
-	UPROPERTY()
-		UHealthComponent* IncreaseHealthPtr;
-
-
 
 
 	// Custom Event to update player stamina to the stamina widget
@@ -98,33 +108,23 @@ public:
 		void OnStaminaUse_Implementation();
 
 
-
-
 	// Camera Spin.... 
 	UFUNCTION(BlueprintNativeEvent, Category = "CameraSpin")
 		void CameraSpin();
 		void CameraSpin_Implementation();
 
-	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
-		bool bShouldRotate;
-		float RotationRate;
 
-	UFUNCTION(BlueprintCallable)
-		void Idle();
-
-
-	void OnInteract(AProjectileBase* ProjectileActor);
-
-
-	UFUNCTION(BlueprintCallable)
-		virtual void Run();
-		void RunEnd();
+		// Spawn Actor
+		UPROPERTY(EditAnywhere, Category = "TSubClass")
+			TSubclassOf<AProjectileBase> Projectileptr;
 
 
 private:
 
 	void MoveVer(float Value);
 	void MoveHor(float Value);
+
+
 
 	UFUNCTION(BlueprintCallable)
 	void StartJump();

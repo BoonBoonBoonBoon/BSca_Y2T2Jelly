@@ -4,9 +4,9 @@
 #include "PlayerClass/PlayerCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework\Actor.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/InputComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -38,6 +38,7 @@ APlayerCharacter::APlayerCharacter()
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(("HealthComp"));
 	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(("StaminaComp"));
+
 
 	/** Attached Subobjects */
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -110,6 +111,10 @@ APlayerCharacter::APlayerCharacter()
 	
 }
 
+
+									//// Movement
+
+
 void APlayerCharacter::MoveVer(float Value)
 {
 
@@ -142,6 +147,52 @@ void APlayerCharacter::MoveHor(float Value)
 
 }
 
+
+void APlayerCharacter::Run()
+{
+	/** Character changes to walkspeed when calling sprint method while its crouching
+	* @see RunEnd method.
+	*
+	**/
+
+	//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
+
+	bIsRunning = true;
+
+	if (bIsRunning) {
+
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+		//StaminaComp->StaminaDrain();
+	}
+	else
+	{
+		RunEnd();
+	}
+
+
+
+}
+
+void APlayerCharacter::RunEnd()
+{
+
+	bIsRunning = false;
+
+	if (!bIsRunning) {
+		/**
+		* MWS is AChar,
+		* accessor needs to access class variables.
+		* WSA Then used as temp data storage.
+		*/
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
+	}
+	else {
+		Run();
+	}
+}
+
+
+
 void APlayerCharacter::StartJump()
 {
 	/**
@@ -163,131 +214,6 @@ void APlayerCharacter::JumpEnd()
 	
 }
 
-
-
-void APlayerCharacter::IncreaseHealth_Implementation()
-{
-
-	UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
-	
-	//IncreaseHealthPtr = Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
-
-	// Engine Crashes 
-	
-	//IncreaseHealthPtr->Regen = 20.f;
-	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
-	
-	//Engine Crashes
-	
-	//IncreaseHealthPtr->IncreaseHealthWidget();
-	
-
-
-}
-
-
-
-
-
-void APlayerCharacter::OnStaminaUse_Implementation()
-{
-}
-
-void APlayerCharacter::CameraSpin_Implementation()
-{
-
-	// Get Help for Cam Spins
-	// @See Idle 
-
-	//AActor* MyOwner = GetOwner();
-	//SpringArmComp = Cast<USpringArmComponent>(MyOwner);
-	//FRotator CameraRotation;
-	//CameraRotation = SpringArmComp->GetComponentRotation();
-	
-}
-
-void APlayerCharacter::Idle()
-{
-	// @See TimerFunction
-	/** SetTimer First Set TimerHandle.
-	* this. Context Actor for location.
-	* Grab timer method.
-	* inRate how often it shows on screen
-	* Checks if loop
-	* firs delay
-	*/
-	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
-}
-
-void APlayerCharacter::OnInteract(AProjectileBase* ProjectileActor)
-{
-
-	AProjectileBase* BulletPtr;
-
-	if (BulletPtr != nullptr) {
-
-		BulletPtr = GetWorld()
-		
-	}
-
-	/**
-	Want to spawn actor -
-	to spawn actor we need to give it a location to spawn.
-	could use getworld maybe or a body part of the actor.
-
-	onactorhit destroy
-	FHitResult
-
-	https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Actors/Spawning/
-	*/
-
-}
-
-
-
-void APlayerCharacter::Run()
-{
-	/** Character changes to walkspeed when calling sprint method while its crouching
-	* @see RunEnd method.
-	*
-	**/
-
-	//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
-
-	bIsRunning = true;
-
-	if (bIsRunning) {
-
-		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-		//StaminaComp->StaminaDrain();
-	}
-	else 
-	{
-		RunEnd();
-	}
-
-	
-
-}
-
-void APlayerCharacter::RunEnd()
-{
-
-	bIsRunning = false;
-
-	if (!bIsRunning) {
-		/**
-		* MWS is AChar,
-		* accessor needs to access class variables.
-		* WSA Then used as temp data storage.
-		*/
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
-	}
-	else {
-		Run();
-	}
-}
 
 void APlayerCharacter::StartCrouch()
 {
@@ -326,6 +252,95 @@ void APlayerCharacter::EndCrouch()
 }
 
 
+						//// Ineractions
+
+
+void APlayerCharacter::Idle()
+{
+	// @See TimerFunction
+	/** SetTimer First Set TimerHandle.
+	* this. Context Actor for location.
+	* Grab timer method.
+	* inRate how often it shows on screen
+	* Checks if loop
+	* firs delay
+	*/
+	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
+}
+
+void APlayerCharacter::InteractPressed()
+{
+	GEngine->AddOnScreenDebugMessage(1, 10, FColor::White, "Shooting");
+
+	// Gets world obj, Returns object
+	UWorld* WLRD = GetWorld();
+
+	FVector Location = GetActorLocation() + FVector(60.f, 0.f, 20.f);
+	FRotator Rotation = GetActorRotation();
+
+
+	WLRD->SpawnActor(Projectileptr, &Location, &Rotation);
+
+
+
+
+}
+
+	//AProjectileBase* ProjectileActor;
+
+	//if (BulletPtr != nullptr) {
+
+		//BulletPtr = GetWorld()
+
+	//}
+
+	/**
+	Want to spawn actor -
+	to spawn actor we need to give it a location to spawn.
+	could use getworld maybe or a body part of the actor.
+
+	onactorhit destroy
+	FHitResult
+
+	https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Actors/Spawning/
+	*/
+
+
+
+void APlayerCharacter::TimerFunction()
+{
+
+	// Timer Handle for Camera Rotation
+
+	/*
+	CallTracker--;
+
+	if (CallTracker == 0)
+	{
+
+		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
+		GetWorldTimerManager().ClearTimer(TimerHandle);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));
+
+	}
+	*/
+}
+
+	
+						//// Tick & Begin Play
+
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
@@ -349,34 +364,50 @@ void APlayerCharacter::BeginPlay()
 	
 }
 
-// Called every frame
-void APlayerCharacter::Tick(float DeltaTime)
+
+					//// Events
+
+
+void APlayerCharacter::IncreaseHealth_Implementation()
 {
-	Super::Tick(DeltaTime);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
+
+	//IncreaseHealthPtr = Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+
+	// Engine Crashes 
+
+	//IncreaseHealthPtr->Regen = 20.f;
+	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
+
+	//Engine Crashes
+
+	//IncreaseHealthPtr->IncreaseHealthWidget();
+
+
 
 }
 
-void APlayerCharacter::TimerFunction()
+
+
+void APlayerCharacter::OnStaminaUse_Implementation()
+{
+}
+
+void APlayerCharacter::CameraSpin_Implementation()
 {
 
-	// Timer Handle for Camera Rotation
+	// Get Help for Cam Spins
+	// @See Idle 
 
-
-	CallTracker--;
-	
-	if(CallTracker == 0)
-	{
-
-		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));
-
-	}
+	//AActor* MyOwner = GetOwner();
+	//SpringArmComp = Cast<USpringArmComponent>(MyOwner);
+	//FRotator CameraRotation;
+	//CameraRotation = SpringArmComp->GetComponentRotation();
 
 }
+
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -408,7 +439,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
 
 	// Fire
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::OnInteract);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::InteractPressed);
 
 }
 

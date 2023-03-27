@@ -71,15 +71,14 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*	Doesnt work
-	* 
+
+
+	/*
 	APlayerCharacter* PlayerChar = Cast<UHealthComponent>(OtherActor);
 	if (Cast<UHealthComponent>(OtherActor)) {
 		UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
 	};
-	*/
-
-	/*
+ --------
 	if (Damage <= 0)
 	{
 		return;		// ... Checking if take damage. 
@@ -89,7 +88,9 @@ void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	*/
 	
 	//Owner = Cast<UHealthComponent>(&TakeDamagePtr)
-	
+
+	//OnTakeDamage(20.f, FDamageEvent(), NULL, NULL);
+
 	UE_LOG(LogTemp, Warning, TEXT("Damage"));
 	Destroy();
 
