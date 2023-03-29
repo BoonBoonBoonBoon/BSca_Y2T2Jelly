@@ -276,40 +276,31 @@ void APlayerCharacter::InteractPressed()
 {
 	GEngine->AddOnScreenDebugMessage(1, 10, FColor::White, "Shooting");
 
-	// Gets world obj, Returns object
+	/*
+	// Defines it in current level. 
 	UWorld* WLRD = GetWorld();
-
+	// Sets temp location to spawn actor.
 	FVector Location = GetActorLocation() + FVector(60.f, 0.f, 20.f);
 	FRotator Rotation = GetActorRotation();
-
-
 	WLRD->SpawnActor(Projectileptr, &Location, &Rotation);
-
-
-
-
-}
-
-	//AProjectileBase* ProjectileActor;
-
-	//if (BulletPtr != nullptr) {
-
-		//BulletPtr = GetWorld()
-
-	//}
-
-	/**
-	Want to spawn actor -
-	to spawn actor we need to give it a location to spawn.
-	could use getworld maybe or a body part of the actor.
-
-	onactorhit destroy
-	FHitResult
-
-	https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Actors/Spawning/
 	*/
 
+	// Line trace for debug.
 
+	FHitResult FHit;
+	FVector StartLoc = GetActorLocation();
+	FVector ForwardVector = CameraComp->GetForwardVector();
+	FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+	FCollisionQueryParams CollisionParam;
+	GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red,false, 2, 0, 3);
+
+	
+
+
+	//onactorhit destroy
+	//FHitResult
+}
 
 void APlayerCharacter::TimerFunction()
 {
@@ -384,33 +375,13 @@ void APlayerCharacter::BeginPlay()
 					//// Events
 void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	/**
-	* @See Health
-	* On TakeDamage Health is given the data,
-	* FMath which is a struct for math problems.
-	*
-	* Use :: because in the class mathUtility FMath is a object like Clamp. Used to refrence object.
-	*
-	* @See Clamp
-	* Uses Clamp method, it requires float and something to attach it to a double.
-	*
-	* Want to tell health to give its original health then minus the incoming damage float,
-	* this tells health that we are getting the value of the health.
-	* Clamp needs a minimum vaue and a maximum value
-	* give it 0.0f, health wont go below 0.
-	* give health back again since that will be the maximum value.
-	*
-	* Use if to check if the damage data has gone above 0.
-	* if true it returns to functon TD,
-	* Then minus it from health.
-	*/
 
-
+	
 	if (Damage <= 0)
 	{
-		return;		// ... Checking if take damage. 
+		return;		
 	}
-
+	// Reduces Health by damage
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
 
@@ -418,25 +389,10 @@ void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const cl
 
 void APlayerCharacter::IncreaseHealth_Implementation()
 {
-
 	//UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
-
-	//UHealthComponent* IncreaseHealthPtr = Cast<UHealthComponent>(UHealthComponent::TakeDamage());
-
-
-
-	//Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	// Engine Crashes 
 
 	//IncreaseHealthPtr->Regen = 20.f;
 	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
-
-	//Engine Crashes
-
-	//IncreaseHealthPtr->IncreaseHealthWidget();
-
-
-
 }
 
 
