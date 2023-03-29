@@ -36,8 +36,8 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 
-	HealthComp = CreateDefaultSubobject<UHealthComponent>(("HealthComp"));
-	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(("StaminaComp"));
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(TEXT("StaminaComp"));
 
 
 	/** Attached Subobjects */
@@ -108,6 +108,10 @@ APlayerCharacter::APlayerCharacter()
 	bShouldRotate = false;
 	RotationRate = 90.f;
 	
+	DefaultHealth = 100.f;
+	Health = DefaultHealth;
+
+
 	
 }
 
@@ -361,21 +365,67 @@ void APlayerCharacter::BeginPlay()
 			PlayerController->PlayerCameraManager->ViewPitchMax = 30.0;
 		}
 	} 
+
+
+	// Get reference to owning actor.
+	AActor* MyOwner = GetOwner();
+	if (MyOwner)
+	{
+		// Delegate Function 
+		MyOwner->OnTakeAnyDamage.AddDynamic(this, &APlayerCharacter::OnTakeDamage);
+	}
+
+
+
 	
 }
 
 
 					//// Events
+void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	/**
+	* @See Health
+	* On TakeDamage Health is given the data,
+	* FMath which is a struct for math problems.
+	*
+	* Use :: because in the class mathUtility FMath is a object like Clamp. Used to refrence object.
+	*
+	* @See Clamp
+	* Uses Clamp method, it requires float and something to attach it to a double.
+	*
+	* Want to tell health to give its original health then minus the incoming damage float,
+	* this tells health that we are getting the value of the health.
+	* Clamp needs a minimum vaue and a maximum value
+	* give it 0.0f, health wont go below 0.
+	* give health back again since that will be the maximum value.
+	*
+	* Use if to check if the damage data has gone above 0.
+	* if true it returns to functon TD,
+	* Then minus it from health.
+	*/
 
+
+	if (Damage <= 0)
+	{
+		return;		// ... Checking if take damage. 
+	}
+
+	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+
+
+}
 
 void APlayerCharacter::IncreaseHealth_Implementation()
 {
 
 	//UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
 
-	//IncreaseHealthPtr = Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//UHealthComponent* IncreaseHealthPtr = Cast<UHealthComponent>(UHealthComponent::TakeDamage());
 
 
+
+	//Cast<UHealthComponent>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	// Engine Crashes 
 
 	//IncreaseHealthPtr->Regen = 20.f;

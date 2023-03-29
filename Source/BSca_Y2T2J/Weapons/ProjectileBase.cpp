@@ -2,9 +2,9 @@
 
 
 #include "Weapons/ProjectileBase.h"
-//#include "Health/HealthComponent.h"
+#include "Health/HealthComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-//#include "PlayerClass\PlayerCharacter.h"
+#include "PlayerClass\PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework\Pawn.h"
 
@@ -17,7 +17,7 @@ AProjectileBase::AProjectileBase()
 	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
 	RootComponent = CollisionBody;
 
-	
+	HealthComp2 = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp2"));
 
 	/** New Component, Attaches it to Root.
 	* Gives this the body.
@@ -71,25 +71,18 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
-
 	/*
-	APlayerCharacter* PlayerChar = Cast<UHealthComponent>(OtherActor);
+	 UHealthComponent* HealthComp = Cast<UHealthComponent>(OtherActor);
 	if (Cast<UHealthComponent>(OtherActor)) {
 		UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
-	};
- --------
-	if (Damage <= 0)
-	{
-		return;		// ... Checking if take damage. 
+
+		OnTakeDamage(20.f, FDamageEvent::FDamageEvent(), NULL, NULL);
+
 	}
-
-	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 	*/
-	
+	//Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth)
 	//Owner = Cast<UHealthComponent>(&TakeDamagePtr)
-
-	//OnTakeDamage(20.f, FDamageEvent(), NULL, NULL);
+	//HealthComp2->OnTakeDamage(OtherActor, 20, nullptr, nullptr, nullptr);
 
 	UE_LOG(LogTemp, Warning, TEXT("Damage"));
 	Destroy();

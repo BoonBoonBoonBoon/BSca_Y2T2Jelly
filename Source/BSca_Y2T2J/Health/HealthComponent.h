@@ -33,15 +33,17 @@ public:
 	* Health presents the infomation on the UI
 
 	*/
+
+	/*
 	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
-		float DefaultHealth;
+		float DefaultHealth = 100;
 	UPROPERTY(BlueprintReadOnly)
-		float Health;
+		float Health = 100;
 
 	UFUNCTION() // ... Dynamic binding
-		void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	void IncreaseHealthWidget();
 	float Regen;
-
+	*/
 };

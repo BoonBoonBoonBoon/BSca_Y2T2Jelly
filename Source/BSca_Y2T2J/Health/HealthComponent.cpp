@@ -3,7 +3,7 @@
 
 #include "Health/HealthComponent.h"
 #include "Components\ProgressBar.h"
-//#include "Weapons\ProjectileBase.cpp"
+#include "Weapons\ProjectileBase.h"
 #include "PlayerClass\PlayerCharacter.h"
 #include "Pickups\PickUpBase.h" 
 
@@ -14,8 +14,8 @@ UHealthComponent::UHealthComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	DefaultHealth = 100.f;
-	Health = DefaultHealth;
+	//DefaultHealth = 100.f;
+	//Health = DefaultHealth;
 
 
 
@@ -36,12 +36,12 @@ void UHealthComponent::BeginPlay()
 	*/
 
 	// Get reference to owning actor,
-	AActor* Owner = GetOwner(); 
-	if (Owner)
-	{
-		// Valid owner returned, whenever takedamage function called, add dynamic binding. 
-		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage); 
-	}
+	//AActor* Owner = GetOwner(); 
+	//if (Owner)
+//	{
+	//	// Valid owner returned, whenever takedamage function called, add dynamic binding. 
+	//	Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeDamage); 
+//	}
 
 	
 }
@@ -50,13 +50,13 @@ void UHealthComponent::BeginPlay()
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
 }
 
-void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
-{
+//void UHealthComponent::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+//{
 	/**
 	* @See Health
 	* On TakeDamage Health is given the data,
@@ -79,23 +79,22 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const clas
 	*/
 
 
-	if (Damage <= 0)
-	{
-		return;		// ... Checking if take damage. 
-	}
+	//if (Damage <= 0)
+	//{
+	//	return;		// ... Checking if take damage. 
+	//}
 
-	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+//	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
 
-}
+//}
 
 //Regen = 20.f;
 
 	//Health = FMath::Clamp(Health + Regen, 0.0f, DefaultHealth);
 
-void UHealthComponent::IncreaseHealthWidget()
-{
-
+//void UHealthComponent::IncreaseHealthWidget()
+//
 	
 
-}
+//}

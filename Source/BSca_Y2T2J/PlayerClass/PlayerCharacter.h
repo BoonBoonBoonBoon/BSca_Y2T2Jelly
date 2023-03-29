@@ -38,46 +38,38 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		class UStaminaComponent* StaminaComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UHealthComponent* HealthComp;
 
+	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
+		float DefaultHealth = 100;
+	UPROPERTY(BlueprintReadOnly)
+		float Health = 100;
 
-
-	// Character X Axis Turn Speed
-	float TurnSpeed;
-
-	// Checks if Running.
-	bool bIsRunning;
-
-	// Checks if jumping.
-	bool bIsJumping;
-
-	// For Characters Max speed with consumables. 
-	float RunSpeedPickup;
-	float JumpHeightPickup;
-
-	// RunSpeed (TEMP) to hold temparate speed infomation. 
-	float RunSpeedTemp;
-
-	// WalkSpeed Avg (TEMP).
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float WalkSpeedAvg;
-
-	// For the Max character speed.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float RunSpeed; 
+	UFUNCTION() // ... Dynamic binding
+		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	
+	float TurnSpeed;
+	bool bIsRunning;
+	bool bIsJumping;
+	// Pickups 
+	float RunSpeedPickup;
+	float JumpHeightPickup;
+	// (TEMP) 
+	float RunSpeedTemp;
 
+
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float WalkSpeedAvg;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float RunSpeed; 
 	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
 		bool bShouldRotate;
-	float RotationRate;
-
-	// Max Avg JumpHeight.
+		float RotationRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float JumpHeight; 
-
-	// CrouchSpeed.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float CrouchSpeed;
 
@@ -85,38 +77,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 		virtual void Run();
 		void RunEnd();
-
-
 	UFUNCTION(BlueprintCallable)
 		void Idle();
-
-
 	UFUNCTION()
 		void InteractPressed();
 		float bullets;
 
 
-	// Custom Event to Update player health to the health widget.
+	// Widget Health Increase.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
 		void IncreaseHealth();
 		void IncreaseHealth_Implementation();
 
 
-	// Custom Event to update player stamina to the stamina widget
+	// Widget Stamina Decrease.
 	UFUNCTION(BlueprintNativeEvent, Category = "OnStaminaUse")
 		void OnStaminaUse();
 		void OnStaminaUse_Implementation();
 
 
-	// Camera Spin.... 
+	// Camera Spin.
 	UFUNCTION(BlueprintNativeEvent, Category = "CameraSpin")
 		void CameraSpin();
 		void CameraSpin_Implementation();
 
 
-		// Spawn Actor
-		UPROPERTY(EditAnywhere, Category = "TSubClass")
-			TSubclassOf<AProjectileBase> Projectileptr;
+	// Spawn Projectile.
+	UPROPERTY(EditAnywhere, Category = "TSubClass")
+		TSubclassOf<AProjectileBase> Projectileptr;
 
 
 private:

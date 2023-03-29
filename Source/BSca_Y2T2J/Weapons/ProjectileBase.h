@@ -11,6 +11,7 @@ class BSCA_Y2T2J_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
 	
+
 public:	
 	// Sets default values for this actor's properties
 	AProjectileBase();
@@ -23,8 +24,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
 		class USphereComponent* CollisionBody;
 
-	AProjectileBase* ProjectilePtr;
+		AProjectileBase* ProjectilePtr;
 
+		UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+			class UHealthComponent* HealthComp2;
+	
 
 protected:
 	// Called when the game starts or when spawned
