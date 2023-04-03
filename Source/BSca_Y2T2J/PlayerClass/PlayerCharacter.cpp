@@ -6,6 +6,7 @@
 #include "GameFramework\Actor.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -15,15 +16,15 @@
 #include "Camera\PlayerCameraManager.h"
 #include "Stamina\StaminaComponent.h"
 #include "Weapons/ProjectileBase.h"
+#include "Pickups\PickUpAmmo.h"
 
 // Defines an Alias. Macro for reusablity.
-#define UsePrintString(String) GEngine->AddOnScreenDebugMessage(-1.f, 150.f, FColor::White, String );
 
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Sets Capsule Comp Size 
@@ -44,6 +45,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	// Accessor needs to close off heirarchy. 
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
+	CameraComp->SetFieldOfView(90.f);
 
 	// Camera Lag Speed
 	SpringArmComp->bEnableCameraLag = true;
@@ -51,7 +53,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->CameraLagSpeed = 4.f;
 	SpringArmComp->CameraRotationLagSpeed = 4.f;
 
-	
+
 	/** Set Absoulte is opposite of Set relative
 	* @see SetRelative
 	* Works to ignore parent, means that it is absolute and will not change
@@ -76,15 +78,10 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	SpringArmComp->bDoCollisionTest = true;
 
-	// Checks if it should use the view/cont rotation of pawn
-	// CameraComp->bUsePawnControlRotation = false;
-
 	GetCharacterMovement()->RotationRate = FRotator(0.f, -80.f, 0.f);
 
-	// Movement Values
 	WalkSpeedAvg = 500.f;
 	RunSpeed = 1200.f;
-	// (Temp) 
 	RunSpeedTemp = 1200.f;
 	// XAxis turn Speed
 	TurnSpeed = 0.5f;
@@ -93,6 +90,7 @@ APlayerCharacter::APlayerCharacter()
 	RunSpeedPickup = 2000.f;
 	JumpHeightPickup = 1000.f;
 
+	// Sprinting jumpVelocity = (normaljump + or - "int");
 
 	// Crouch Values
 	CrouchSpeed = 250.f;
@@ -101,18 +99,56 @@ APlayerCharacter::APlayerCharacter()
 	JumpHeight = 600.f;
 
 	// Boolean Values
-	bIsRunning = false; 
+	bIsRunning = false;
 	bIsJumping = false;
+	bIsFiring = false;
+	bIsZoomedin = false;
+	bIsWalking = false;
+	bWantstoFire = false;
 
 	// @See Idle
 	bShouldRotate = false;
 	RotationRate = 90.f;
-	
+
 	DefaultHealth = 100.f;
 	Health = DefaultHealth;
 
+	MaxAmmo = 90;
+	DefaultAmmo = 10;
+	AmmoUse = 1;
 
-	
+	ZoomWalkSpeed = 250.f;
+	ZoomRunSpeed = 600.f;
+	ZoomCrouchSpeed = 180.f;
+}
+
+void APlayerCharacter::CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom) 
+{
+
+
+	if (bIsRunning == true && bIsZoomedin)
+	{
+		
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		
+	}
+	else if (bIsWalking == true && !bIsRunning && bIsZoomedin)
+	{ 
+		GetCharacterMovement()->MaxWalkSpeed = 250.f;
+	}
+		else if (bIsWalking && !bIsZoomedin && !bIsRunning && !bIsCrouched)
+		{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
+		}
+	else if (bIsCrouched == true && bIsZoomedin)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 180.f;
+	}
+	else 
+	{
+		return;
+	}
+
 }
 
 
@@ -121,14 +157,22 @@ APlayerCharacter::APlayerCharacter()
 
 void APlayerCharacter::MoveVer(float Value)
 {
-
-	AddMovementInput(GetActorForwardVector(), Value);
-
+	//if (bIsZoomedin) 
+	
+		//int WalkTemp = WalkSpeedAvg - 400;
+		//GetCharacterMovement()->MaxWalkSpeed = WalkTemp;
+		//AddMovementInput(GetActorForwardVector(), Value);
+	CheckBooleans(true, NULL, NULL, NULL, bIsZoomedin);
+	bIsWalking = true;
+	if (bIsWalking) {
+		AddMovementInput(GetActorForwardVector(), Value);
+	}
+		
+	
 }
 
 void APlayerCharacter::MoveHor(float Value)
 {
-
 	/**
 	* If Ctrl & Value are not NULL
 	* Var Rotation of Type FRotator Gets Cntrl rotation method.
@@ -137,19 +181,18 @@ void APlayerCharacter::MoveHor(float Value)
 	* Var Dir of type FVector assigned @see FRotationMatrix
 	* @FRM constructs matrix represents pure rotation, no translation or scale
 	*/
-
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
+		CheckBooleans(true, NULL, NULL, NULL, bIsZoomedin);
 
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
-
 	}
-
-
 }
+
+//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
 
 
 void APlayerCharacter::Run()
@@ -158,31 +201,25 @@ void APlayerCharacter::Run()
 	* @see RunEnd method.
 	*
 	**/
-
-	//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
+	CheckBooleans(NULL, true, NULL, NULL, bIsZoomedin);
 
 	bIsRunning = true;
-
-	if (bIsRunning) {
-
+	if (bIsRunning == true && bIsZoomedin == false) 
+	{
 		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-		//StaminaComp->StaminaDrain();
 	}
-	else
+	else if (!bIsRunning)
 	{
 		RunEnd();
 	}
-
-
-
 }
 
 void APlayerCharacter::RunEnd()
 {
-
 	bIsRunning = false;
 
-	if (!bIsRunning) {
+	if (!bIsRunning && !bIsZoomedin) 
+	{
 		/**
 		* MWS is AChar,
 		* accessor needs to access class variables.
@@ -190,8 +227,9 @@ void APlayerCharacter::RunEnd()
 		*/
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
 	}
-	else {
-		Run();
+	else 
+	{
+		return;
 	}
 }
 
@@ -221,15 +259,21 @@ void APlayerCharacter::JumpEnd()
 
 void APlayerCharacter::StartCrouch()
 {
-	bIsCrouched = true;
-	if (bIsCrouched) {
-		GetCharacterMovement()->SetJumpAllowed(false);
-		
 
+	CheckBooleans(NULL, NULL, true, NULL, bIsZoomedin);
+	bIsCrouched = true;
+	if (bIsZoomedin == true && bIsCrouched == false) 
+	{
+		GetCharacterMovement()->SetJumpAllowed(false);
 		GetCapsuleComponent()->SetCapsuleHalfHeight(48.f);
 		GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
 		APlayerCharacter::RunSpeed = CrouchSpeed;
+
+	} else if (!bIsCrouched) 
+	{
+		EndCrouch();
 	}
+	
 	
 }
 
@@ -240,7 +284,6 @@ void APlayerCharacter::EndCrouch()
 
 	if (!bIsCrouched) 
 	{
-
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
 		APlayerCharacter::RunSpeed = RunSpeedTemp;
 		APlayerCharacter::UnCrouch();
@@ -248,12 +291,11 @@ void APlayerCharacter::EndCrouch()
 	}
 	else if (bIsCrouched)
 	{
-
 		bIsRunning = false;
-
 	}
 
 }
+
 
 
 						//// Ineractions
@@ -272,59 +314,97 @@ void APlayerCharacter::Idle()
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
 }
 
-void APlayerCharacter::InteractPressed()
+void APlayerCharacter::OnFireRifle()
 {
-	GEngine->AddOnScreenDebugMessage(1, 10, FColor::White, "Shooting");
-
-	/*
-	// Defines it in current level. 
-	UWorld* WLRD = GetWorld();
-	// Sets temp location to spawn actor.
-	FVector Location = GetActorLocation() + FVector(60.f, 0.f, 20.f);
-	FRotator Rotation = GetActorRotation();
-	WLRD->SpawnActor(Projectileptr, &Location, &Rotation);
+	/**
+	To check if we can pickup anything to begin with we need to check if the max ammo has been hit
+	So we need a max ammo var & if we are firing.
+	and a if we want to fire var.
 	*/
 
-	// Line trace for debug.
+	bWantstoFire = true;
+	bHasAmmo = DefaultAmmo > 0;
 
-	FHitResult FHit;
-	FVector StartLoc = GetActorLocation();
-	FVector ForwardVector = CameraComp->GetForwardVector();
-	FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
-	FCollisionQueryParams CollisionParam;
-	GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red,false, 2, 0, 3);
+	// Change with ammo pickup
+	MaxAmmo = 90, DefaultAmmo;
+	UE_LOG(LogTemp, Warning, TEXT("Max Ammo is %d"), MaxAmmo);
 
-	
+	if (bWantstoFire == true && bIsFiring == false) 
+	{
+		if (bHasAmmo) 
+		{
+			DefaultAmmo = DefaultAmmo - AmmoUse;
+			UE_LOG(LogTemp, Warning, TEXT("Player Ammo is %d"), DefaultAmmo);
 
 
+			FHitResult FHit;
+			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+			FVector ForwardVector = CameraComp->GetForwardVector();
+			FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+			FCollisionQueryParams CollisionParam;
+			bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+
+			if (bHit)
+			{
+				DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
+				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
+			}
+
+		} else
+			{
+			UE_LOG(LogTemp, Error, TEXT("Player has ran out of ammo!"));
+			return;
+			}
+
+	}
+	// DONT FORGET MANUAL RELOAD
+
+	//PickUpAmmo* AmmoPtr{};
+	//AmmoPtr->OnOverlapBegin(GetCapsuleComponent(), );
+	//UE_LOG(LogTemp, Error, TEXT("Player Now Has %d Amount of Ammo"), DefaultAmmo);
 	//onactorhit destroy
 	//FHitResult
 }
 
-void APlayerCharacter::TimerFunction()
+
+int APlayerCharacter::CalculateAmmo(int _ammoAmount)
 {
-
-	// Timer Handle for Camera Rotation
-
-	/*
-	CallTracker--;
-
-	if (CallTracker == 0)
-	{
-
-		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));
-
-	}
-	*/
+	return 0;
 }
 
-	
+
+
+void APlayerCharacter::ZoomIn() 
+{
+	bIsZoomedin = true;
+
+	if (bIsZoomedin) {
+		CameraComp->SetFieldOfView(70.f);
+		CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
+		UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
+	}
+	else if (!bIsZoomedin) 
+	{
+		ZoomOut();
+	}
+}
+
+void APlayerCharacter::ZoomOut() 
+{
+	bIsZoomedin = false;
+
+	if (!bIsZoomedin) {
+		CameraComp->SetFieldOfView(90.f);
+		CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
+		UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
+	}
+	else 
+	{
+		return;
+	}
+}
+
+
 						//// Tick & Begin Play
 
 
@@ -332,7 +412,7 @@ void APlayerCharacter::TimerFunction()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin);
 }
 
 
@@ -340,13 +420,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
-	
-
 	// DOCCUMENT FOR TOMORROW WEBSITE
-	
+
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
 	{
@@ -357,7 +433,6 @@ void APlayerCharacter::BeginPlay()
 		}
 	} 
 
-
 	// Get reference to owning actor.
 	AActor* MyOwner = GetOwner();
 	if (MyOwner)
@@ -365,10 +440,6 @@ void APlayerCharacter::BeginPlay()
 		// Delegate Function 
 		MyOwner->OnTakeAnyDamage.AddDynamic(this, &APlayerCharacter::OnTakeDamage);
 	}
-
-
-
-	
 }
 
 
@@ -389,29 +460,27 @@ void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const cl
 
 void APlayerCharacter::IncreaseHealth_Implementation()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
-
 	//IncreaseHealthPtr->Regen = 20.f;
 	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
 }
-
-
-
 void APlayerCharacter::OnStaminaUse_Implementation()
 {
 }
-
 void APlayerCharacter::CameraSpin_Implementation()
 {
+}
 
-	// Get Help for Cam Spins
-	// @See Idle 
-
-	//AActor* MyOwner = GetOwner();
-	//SpringArmComp = Cast<USpringArmComponent>(MyOwner);
-	//FRotator CameraRotation;
-	//CameraRotation = SpringArmComp->GetComponentRotation();
-
+void APlayerCharacter::TimerFunction()
+{
+	// Timer Handle for Camera Rotation
+	/*
+	CallTracker--;
+	if (CallTracker == 0)
+	{GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
+	GetWorldTimerManager().ClearTimer(TimerHandle);}
+	else{
+		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));}
+	*/
 }
 
 
@@ -420,32 +489,34 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// ... Move Vertical and Horizontally Input Control
 	PlayerInputComponent->BindAxis("MoveVer", this, &APlayerCharacter::MoveVer);
 	PlayerInputComponent->BindAxis("MoveHor", this, &APlayerCharacter::MoveHor);
 
 	// ... Camera Yaw and Pitch Control
 
 	/** Use of APawn since the method AddCYI is not a Construct of APlayerChar
-	* Apawn used to reference the premade method
 	* @see LookPitch */
 	PlayerInputComponent->BindAxis("Look Yaw", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Look Pitch", this, &APawn::AddControllerPitchInput);
 
-	// ... Jumping Input Control
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::JumpEnd);
 
-	// ... Running Input Control
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APlayerCharacter::Run);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &APlayerCharacter::RunEnd);
 
-	// ... Crouch Input Control
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::StartCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
 
-	// Fire
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::InteractPressed);
+	// bind fire events
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnFireRifle);
+	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &APlayerCharacter::ZoomIn);
+	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &APlayerCharacter::ZoomOut);
 
+	
+
+
+	// Manual Reload 
+	//Zoom in & zoom out
 }
 

@@ -41,71 +41,88 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UHealthComponent* HealthComp;
 
+	
+
 	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
 		float DefaultHealth = 100;
 	UPROPERTY(BlueprintReadOnly)
 		float Health = 100;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float WalkSpeedAvg;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float RunSpeed;
+	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
+		bool bShouldRotate;
+		float RotationRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float JumpHeight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float CrouchSpeed;
 
-	UFUNCTION() // ... Dynamic binding
-		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	// Spawn Projectile.
+	UPROPERTY(EditAnywhere, Category = "TSubClass")
+		TSubclassOf<AProjectileBase> Projectileptr;
 
-	
+
 	float TurnSpeed;
 	bool bIsRunning;
 	bool bIsJumping;
+	bool bIsWalking;
 	// Pickups 
 	float RunSpeedPickup;
 	float JumpHeightPickup;
 	// (TEMP) 
 	float RunSpeedTemp;
 
+	int MaxAmmo;
+	int DefaultAmmo;
+	int AmmoUse;
+	bool bHasAmmo;
+
+	// New implementation 
+	bool bWantstoFire;
+	bool bIsFiring;
 
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float WalkSpeedAvg;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float RunSpeed; 
-	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
-		bool bShouldRotate;
-		float RotationRate;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float JumpHeight; 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float CrouchSpeed;
-
-
 	UFUNCTION(BlueprintCallable)
 		virtual void Run();
 		void RunEnd();
 	UFUNCTION(BlueprintCallable)
 		void Idle();
-	UFUNCTION()
-		void InteractPressed();
-		float bullets;
-
 
 	// Widget Health Increase.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
 		void IncreaseHealth();
 		void IncreaseHealth_Implementation();
 
-
 	// Widget Stamina Decrease.
 	UFUNCTION(BlueprintNativeEvent, Category = "OnStaminaUse")
 		void OnStaminaUse();
 		void OnStaminaUse_Implementation();
-
 
 	// Camera Spin.
 	UFUNCTION(BlueprintNativeEvent, Category = "CameraSpin")
 		void CameraSpin();
 		void CameraSpin_Implementation();
 
+		UFUNCTION() // ... Dynamic binding
+			void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	// Spawn Projectile.
-	UPROPERTY(EditAnywhere, Category = "TSubClass")
-		TSubclassOf<AProjectileBase> Projectileptr;
+		UFUNCTION()
+			void OnFireRifle();
 
+		// Calculate the ammo in the magazine.
+		int CalculateAmmo(int _ammoAmount);
+
+		// zoom types
+		void ZoomIn();
+		void ZoomOut();
+		bool bIsZoomedin;
+		int ZoomWalkSpeed;
+		int ZoomRunSpeed;
+		int ZoomCrouchSpeed;
+
+		void CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
 
 private:
 
