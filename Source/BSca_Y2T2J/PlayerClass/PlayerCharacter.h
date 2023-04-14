@@ -74,19 +74,22 @@ public:
 	// (TEMP) 
 	float RunSpeedTemp;
 
-	int MaxAmmo;
-	int DefaultAmmo;
-	int AmmoUse;
-	bool bHasAmmo;
-
-	// New implementation 
-	bool bWantstoFire;
-	bool bIsFiring;
-
+	// Firing Variables
+	int MaxDefaultAmmo; // Max amount of useable ammo, can be manipulated.
+	int MaxAmmo; // Max Set ammo, Cannot be manipulated.
+	int DefaultMagazineAmmo; // Max Ammo in a magazine, 30.
+	int MagazineAmmo; // Useable ammo in the magazine.
+	int AmmoUse; // Bullets used, for rifle would be 1 per call, but shotgun would be 3 - 5.
+	bool bHasAmmo; // checks ammo
+	bool bWantstoFire; // checks if it CAN fire
+	bool bIsFiring; // checks if it IS firing
+	bool bIsRifle;
+	bool bIsShotgun;
 	
 	UFUNCTION(BlueprintCallable)
 		virtual void Run();
 		void RunEnd();
+
 	UFUNCTION(BlueprintCallable)
 		void Idle();
 
@@ -108,21 +111,43 @@ public:
 		UFUNCTION() // ... Dynamic binding
 			void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+		void CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
+
+		// Weapons
+
+
 		UFUNCTION()
-			void OnFireRifle();
+			void OnBasicFire(); // changed name from onriflefire, will be used as boilerplate as the rifle.
+			void OnShotGunFire(); // shotgun params
+
+		void ManualReload();
+		void SwitchWeapon();
+
+
+		//void EquippedWeapon();
+
+		class ABaseWeaponControl* EquippedWeapon;
 
 		// Calculate the ammo in the magazine.
 		int CalculateAmmo(int _ammoAmount);
 
+		// Weapon Array
+		UPROPERTY()
+		TArray<ABaseWeaponControl*> CheckWeaponIndex;
+
+		//FORCEINLINE
+
 		// zoom types
 		void ZoomIn();
 		void ZoomOut();
+
 		bool bIsZoomedin;
 		int ZoomWalkSpeed;
 		int ZoomRunSpeed;
 		int ZoomCrouchSpeed;
 
-		void CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
+		
+
 
 private:
 

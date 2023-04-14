@@ -17,6 +17,7 @@
 #include "Stamina\StaminaComponent.h"
 #include "Weapons/ProjectileBase.h"
 #include "Pickups\PickUpAmmo.h"
+#include "Weapons\BaseWeaponControl.h"
 
 // Defines an Alias. Macro for reusablity.
 
@@ -101,10 +102,8 @@ APlayerCharacter::APlayerCharacter()
 	// Boolean Values
 	bIsRunning = false;
 	bIsJumping = false;
-	bIsFiring = false;
 	bIsZoomedin = false;
 	bIsWalking = false;
-	bWantstoFire = false;
 
 	// @See Idle
 	bShouldRotate = false;
@@ -112,11 +111,23 @@ APlayerCharacter::APlayerCharacter()
 
 	DefaultHealth = 100.f;
 	Health = DefaultHealth;
+	
+	// Ammo & Firing.
+	MaxDefaultAmmo = 90;
+	MaxAmmo = MaxDefaultAmmo;
 
-	MaxAmmo = 90;
-	DefaultAmmo = 10;
-	AmmoUse = 1;
+	DefaultMagazineAmmo = 90; 
+	MagazineAmmo = DefaultMagazineAmmo;
 
+	AmmoUse = 0;
+
+	bHasAmmo = false; 
+	bWantstoFire = false; 
+	bIsFiring = false; 
+	bIsRifle = false;
+	bIsShotgun = false;
+
+	// Focused Movement values.
 	ZoomWalkSpeed = 250.f;
 	ZoomRunSpeed = 600.f;
 	ZoomCrouchSpeed = 180.f;
@@ -124,8 +135,6 @@ APlayerCharacter::APlayerCharacter()
 
 void APlayerCharacter::CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom) 
 {
-
-
 	if (bIsRunning == true && bIsZoomedin)
 	{
 		
@@ -136,10 +145,10 @@ void APlayerCharacter::CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCr
 	{ 
 		GetCharacterMovement()->MaxWalkSpeed = 250.f;
 	}
-		else if (bIsWalking && !bIsZoomedin && !bIsRunning && !bIsCrouched)
-		{
+	else if (bIsWalking && !bIsZoomedin && !bIsRunning && !bIsCrouched)
+	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
-		}
+	}
 	else if (bIsCrouched == true && bIsZoomedin)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 180.f;
@@ -148,7 +157,6 @@ void APlayerCharacter::CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCr
 	{
 		return;
 	}
-
 }
 
 
@@ -261,6 +269,7 @@ void APlayerCharacter::StartCrouch()
 {
 
 	CheckBooleans(NULL, NULL, true, NULL, bIsZoomedin);
+
 	bIsCrouched = true;
 	if (bIsZoomedin == true && bIsCrouched == false) 
 	{
@@ -314,7 +323,7 @@ void APlayerCharacter::Idle()
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
 }
 
-void APlayerCharacter::OnFireRifle()
+void APlayerCharacter::OnBasicFire()
 {
 	/**
 	To check if we can pickup anything to begin with we need to check if the max ammo has been hit
@@ -323,18 +332,18 @@ void APlayerCharacter::OnFireRifle()
 	*/
 
 	bWantstoFire = true;
-	bHasAmmo = DefaultAmmo > 0;
+	bHasAmmo = MaxDefaultAmmo > 0;
 
 	// Change with ammo pickup
-	MaxAmmo = 90, DefaultAmmo;
+	MaxAmmo = 90, MaxDefaultAmmo;
 	UE_LOG(LogTemp, Warning, TEXT("Max Ammo is %d"), MaxAmmo);
 
 	if (bWantstoFire == true && bIsFiring == false) 
 	{
 		if (bHasAmmo) 
 		{
-			DefaultAmmo = DefaultAmmo - AmmoUse;
-			UE_LOG(LogTemp, Warning, TEXT("Player Ammo is %d"), DefaultAmmo);
+			MaxDefaultAmmo = MaxDefaultAmmo - AmmoUse;
+			UE_LOG(LogTemp, Warning, TEXT("Player Ammo is %d"), );
 
 
 			FHitResult FHit;
@@ -364,6 +373,28 @@ void APlayerCharacter::OnFireRifle()
 	//UE_LOG(LogTemp, Error, TEXT("Player Now Has %d Amount of Ammo"), DefaultAmmo);
 	//onactorhit destroy
 	//FHitResult
+}
+
+void APlayerCharacter::OnShotGunFire()
+{
+}
+
+void APlayerCharacter::ManualReload()
+{
+
+	UE_LOG(LogTemp, Error, TEXT("Reload"));
+
+}
+
+void APlayerCharacter::SwitchWeapon()
+{
+	UE_LOG(LogTemp, Error, TEXT("Switch"));
+	//APlayerCharacter* Owner = this;
+	//if (CheckWeaponIndex.Num() != 0) 
+	//{
+		
+	//}
+
 }
 
 
@@ -509,7 +540,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
 
 	// bind fire events
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnFireRifle);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnBasicFire);
+	PlayerInputComponent->BindAction("ManualReload", IE_Pressed, this, &APlayerCharacter::ManualReload);
+	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &APlayerCharacter::SwitchWeapon);
+
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &APlayerCharacter::ZoomIn);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &APlayerCharacter::ZoomOut);
 
