@@ -42,11 +42,14 @@ public:
 		class UHealthComponent* HealthComp;
 
 	
-
+/*
 	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
 		float DefaultHealth = 100;
 	UPROPERTY(BlueprintReadOnly)
 		float Health = 100;
+	*/
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float WalkSpeedAvg;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -76,14 +79,16 @@ public:
 
 	// Firing Variables
 	int MaxDefaultAmmo; // Max amount of useable ammo, can be manipulated.
-	int const MaxAmmo = 90; // Max Set ammo, Cannot be manipulated.
+	int MaxAmmo = 90; // Max Set ammo, Cannot be manipulated.
 
 	int MagazineAmmo; // Useable ammo in the magazine.
-	int const MaxDefaultMagazineAmmo = 30; // Max Ammo in a magazine, 30.
+	int MaxDefaultMagazineAmmo = 30; // Max Ammo in a magazine, 30.
 	
 
 	int AmmoUse; // Bullets used, for rifle would be 1 per call, but shotgun would be 3 - 5.
 
+	bool bHasMagAmmo;
+	bool bHasInvAmmo;
 	bool bHasAmmo; // checks ammo
 	bool bWantstoFire; // checks if it CAN fire
 	bool bIsFiring; // checks if it IS firing
@@ -144,7 +149,7 @@ public:
 
 
 		// Calculate the ammo in the magazine.
-		//void CalculateAmmo(int MagazineUse);
+		//int CalculateAmmo(int AmmoInUse, int AmmoToTakeAway);
 
 		// zoom types
 		void ZoomIn();

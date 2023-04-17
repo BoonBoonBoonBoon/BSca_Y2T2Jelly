@@ -109,13 +109,18 @@ APlayerCharacter::APlayerCharacter()
 	bShouldRotate = false;
 	RotationRate = 90.f;
 
-	DefaultHealth = 100.f;
-	Health = DefaultHealth;
+	//DefaultHealth = 100.f;
+	//Health = DefaultHealth;
 	
 	// Ammo & Firing.
-	
 	AmmoUse = 1;
-	MaxDefaultAmmo = 30;
+	MaxDefaultAmmo = 90;
+	// Sets the max amount of ammmo in inv
+	MaxAmmo = MaxDefaultAmmo;
+
+	MagazineAmmo = 30;
+	// Sets the max Amount of ammo in mag
+	MaxDefaultMagazineAmmo = MagazineAmmo; 
 
 	bHasAmmo = false; 
 	bWantstoFire = false; 
@@ -326,24 +331,22 @@ void APlayerCharacter::OnBasicFire()
 	So we need a max ammo var & if we are firing.
 	and a if we want to fire var.
 	*/
+	
 
 	bWantstoFire = true;
+	bIsFiring = false;
+
+	bHasInvAmmo = MaxDefaultAmmo > 0;
+	bHasMagAmmo = MagazineAmmo > 0;
 	bHasAmmo = MaxDefaultAmmo > 0, MagazineAmmo > 0;
-	
-	// Change with ammo pickup
-	//MaxAmmo = 90, MaxDefaultAmmo;
-	//UE_LOG(LogTemp, Warning, TEXT("Max Ammo is %d"), MaxAmmo);
 
-	if (bWantstoFire == true && bIsFiring == false) 
+	if (bWantstoFire && !bIsFiring ) 
 	{
-		if (bHasAmmo) 
+		if (bHasMagAmmo) 
 		{
-
-			MagazineAmmo = MagazineAmmo - AmmoUse;
-			MaxDefaultAmmo = MaxDefaultAmmo - AmmoUse;
-
-			UE_LOG(LogTemp, Warning, TEXT("Player Magazine Ammo is : %d"), MagazineAmmo);
-			UE_LOG(LogTemp, Error, TEXT("Player Inventory Ammo is %d"), MaxDefaultAmmo);
+			bIsFiring = true;
+			UseAmmo();
+		
 
 			FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
@@ -358,15 +361,13 @@ void APlayerCharacter::OnBasicFire()
 				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
 			}
 
-		} else
-			{
-			UE_LOG(LogTemp, Error, TEXT("Player has ran out of ammo!"));
+		} else {
+			UE_LOG(LogTemp, Error, TEXT("OnFire) Player has ran out of Ammo for the Magazine!"));
 			return;
 			}
 
 	}
-	// DONT FORGET MANUAL RELOAD
-
+	
 	//PickUpAmmo* AmmoPtr{};
 	//AmmoPtr->OnOverlapBegin(GetCapsuleComponent(), );
 	//UE_LOG(LogTemp, Error, TEXT("Player Now Has %d Amount of Ammo"), DefaultAmmo);
@@ -380,10 +381,56 @@ void APlayerCharacter::OnShotGunFire()
 
 void APlayerCharacter::ManualReload()
 {
+	if (bHasInvAmmo) {
+		int MagAmmoStorage = 0;
+		//int NewMagazine = 0;
+		//int DefammoRef = 0;
+		UE_LOG(LogTemp, Error, TEXT("Reloading"));
 
-	UE_LOG(LogTemp, Error, TEXT("Reloading"));
-	MagazineAmmo = MaxDefaultAmmo - MagazineAmmo;
-	MaxDefaultAmmo = FMath::Clamp(MagazineAmmo, 0.0f, MaxAmmo);
+		
+			// Store Magazine ammo value (Int Between 0 to 30)
+				MagAmmoStorage = MagazineAmmo;
+		
+			// reduce ammo to zero (Empty The Mag)
+				MagazineAmmo = 0;
+		
+			// Store inventory ammo value (Int Between 0 to 90)
+				int InventoryAmmoStorage = MaxDefaultAmmo;
+
+			// NewMagazine Cannot Go higher or lower than 30 and zero. - MagContainer cannot go below 0 and higher than 30, add Whatever value inventory ammo has inbetween 0/30
+				int NewMagazine = FMath::Clamp(NewMagazine + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
+
+			// Taking away a whole mag from Ammo inventory (Subtract 30 from the DefAmmo Int (0 to 90))
+				MaxDefaultAmmo = FMath::Clamp(MaxDefaultAmmo - NewMagazine, 0.f, MaxAmmo);
+
+			// Refill the Magazine to full (30 - 0)
+				MagazineAmmo = NewMagazine;
+
+			// Redistribute the original amount of ammo from magazineAmmo
+				MaxDefaultAmmo = MagAmmoStorage;
+				
+				// MagazineAmmo = MagazineAmmo + NewMagazine;
+			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Magazine Ammo is now at %d"), MagazineAmmo);
+			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Invetory Ammo is now at %d"), MaxDefaultAmmo);
+	}
+	else {
+		
+		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
+		
+	}
+
+	
+	
+	//MaxDefaultAmmo = MagazineAmmo - 30 - MaxDefaultAmmo;
+	//UE_LOG(LogTemp, Warning, TEXT("Player Magazine Ammo is : %d"), MaxDefaultAmmo);
+	
+	// Calculate ammo 
+	//CalculateAmmo(30, MagazineAmmo);
+
+	//MaxDefaultAmmo = FMath::Clamp(MagazineAmmo - 30, 0.0f, MaxAmmo);
+	
+
+	
 
 }
 
@@ -396,20 +443,24 @@ void APlayerCharacter::SwitchWeapon()
 
 void APlayerCharacter::UseAmmo() 
 {
-	MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
+	if (bHasMagAmmo) {
+		MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
+
+			//if (bHasInvAmmo) {
+				//MaxDefaultAmmo = FMath::Clamp(MaxDefaultAmmo - AmmoUse, 0.0f, MaxAmmo);
+				//UE_LOG(LogTemp, Error, TEXT("Player inventory Ammo is : %d"), MaxDefaultAmmo)}
+	} 
 }
 
-//void APlayerCharacter::CalculateAmmo(int MagazineUse)
+
+//int APlayerCharacter::CalculateAmmo(int AmmoInUse, int AmmoToTakeAway)
 //{
-
-	//MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
-
-	
+//	return;
 //}
 
 
-
-void APlayerCharacter::ZoomIn() 
+void APlayerCharacter::ZoomIn()
 {
 	bIsZoomedin = true;
 
@@ -456,7 +507,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
-	// DOCCUMENT FOR TOMORROW WEBSITE
 
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -468,30 +518,11 @@ void APlayerCharacter::BeginPlay()
 		}
 	} 
 
-	// Get reference to owning actor.
-	AActor* MyOwner = GetOwner();
-	if (MyOwner)
-	{
-		// Delegate Function 
-		MyOwner->OnTakeAnyDamage.AddDynamic(this, &APlayerCharacter::OnTakeDamage);
-	}
 }
 
 
 					//// Events
-void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
-{
 
-	
-	if (Damage <= 0)
-	{
-		return;		
-	}
-	// Reduces Health by damage
-	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
-
-
-}
 
 void APlayerCharacter::IncreaseHealth_Implementation()
 {
@@ -550,11 +581,5 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &APlayerCharacter::ZoomIn);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &APlayerCharacter::ZoomOut);
-
-	
-
-
-	// Manual Reload 
-	//Zoom in & zoom out
 }
 

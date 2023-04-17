@@ -34,7 +34,7 @@ public:
 
 	*/
 
-	/*
+	
 	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
 		float DefaultHealth = 100;
 	UPROPERTY(BlueprintReadOnly)
@@ -45,5 +45,5 @@ public:
 
 	void IncreaseHealthWidget();
 	float Regen;
-	*/
+	
 };
