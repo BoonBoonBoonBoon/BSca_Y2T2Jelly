@@ -76,10 +76,14 @@ public:
 
 	// Firing Variables
 	int MaxDefaultAmmo; // Max amount of useable ammo, can be manipulated.
-	int MaxAmmo; // Max Set ammo, Cannot be manipulated.
-	int DefaultMagazineAmmo; // Max Ammo in a magazine, 30.
+	int const MaxAmmo = 90; // Max Set ammo, Cannot be manipulated.
+
 	int MagazineAmmo; // Useable ammo in the magazine.
+	int const MaxDefaultMagazineAmmo = 30; // Max Ammo in a magazine, 30.
+	
+
 	int AmmoUse; // Bullets used, for rifle would be 1 per call, but shotgun would be 3 - 5.
+
 	bool bHasAmmo; // checks ammo
 	bool bWantstoFire; // checks if it CAN fire
 	bool bIsFiring; // checks if it IS firing
@@ -110,8 +114,7 @@ public:
 
 		UFUNCTION() // ... Dynamic binding
 			void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-
-		void CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
+			void CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
 
 		// Weapons
 
@@ -121,21 +124,27 @@ public:
 			void OnShotGunFire(); // shotgun params
 
 		void ManualReload();
+		
+		void UseAmmo();
+
 		void SwitchWeapon();
 
 
-		//void EquippedWeapon();
-
+		// Equip Weapon
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
 		class ABaseWeaponControl* EquippedWeapon;
 
-		// Calculate the ammo in the magazine.
-		int CalculateAmmo(int _ammoAmount);
+		// Inline to return a Getter
+		FORCEINLINE ABaseWeaponControl* GetEquippedWeapon() { return EquippedWeapon; }
+		FORCEINLINE void SetEquippedWeapon(ABaseWeaponControl* WeaponRefrence) { EquippedWeapon = WeaponRefrence; }
 
 		// Weapon Array
 		UPROPERTY()
 		TArray<ABaseWeaponControl*> CheckWeaponIndex;
 
-		//FORCEINLINE
+
+		// Calculate the ammo in the magazine.
+		//void CalculateAmmo(int MagazineUse);
 
 		// zoom types
 		void ZoomIn();

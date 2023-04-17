@@ -113,13 +113,9 @@ APlayerCharacter::APlayerCharacter()
 	Health = DefaultHealth;
 	
 	// Ammo & Firing.
-	MaxDefaultAmmo = 90;
-	MaxAmmo = MaxDefaultAmmo;
-
-	DefaultMagazineAmmo = 90; 
-	MagazineAmmo = DefaultMagazineAmmo;
-
-	AmmoUse = 0;
+	
+	AmmoUse = 1;
+	MaxDefaultAmmo = 30;
 
 	bHasAmmo = false; 
 	bWantstoFire = false; 
@@ -133,7 +129,7 @@ APlayerCharacter::APlayerCharacter()
 	ZoomCrouchSpeed = 180.f;
 }
 
-void APlayerCharacter::CheckBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom) 
+void APlayerCharacter::CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom) 
 {
 	if (bIsRunning == true && bIsZoomedin)
 	{
@@ -170,7 +166,7 @@ void APlayerCharacter::MoveVer(float Value)
 		//int WalkTemp = WalkSpeedAvg - 400;
 		//GetCharacterMovement()->MaxWalkSpeed = WalkTemp;
 		//AddMovementInput(GetActorForwardVector(), Value);
-	CheckBooleans(true, NULL, NULL, NULL, bIsZoomedin);
+	CheckMovementBooleans(true, NULL, NULL, NULL, bIsZoomedin);
 	bIsWalking = true;
 	if (bIsWalking) {
 		AddMovementInput(GetActorForwardVector(), Value);
@@ -191,7 +187,7 @@ void APlayerCharacter::MoveHor(float Value)
 	*/
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		CheckBooleans(true, NULL, NULL, NULL, bIsZoomedin);
+		CheckMovementBooleans(true, NULL, NULL, NULL, bIsZoomedin);
 
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -209,7 +205,7 @@ void APlayerCharacter::Run()
 	* @see RunEnd method.
 	*
 	**/
-	CheckBooleans(NULL, true, NULL, NULL, bIsZoomedin);
+	CheckMovementBooleans(NULL, true, NULL, NULL, bIsZoomedin);
 
 	bIsRunning = true;
 	if (bIsRunning == true && bIsZoomedin == false) 
@@ -268,7 +264,7 @@ void APlayerCharacter::JumpEnd()
 void APlayerCharacter::StartCrouch()
 {
 
-	CheckBooleans(NULL, NULL, true, NULL, bIsZoomedin);
+	CheckMovementBooleans(NULL, NULL, true, NULL, bIsZoomedin);
 
 	bIsCrouched = true;
 	if (bIsZoomedin == true && bIsCrouched == false) 
@@ -332,19 +328,22 @@ void APlayerCharacter::OnBasicFire()
 	*/
 
 	bWantstoFire = true;
-	bHasAmmo = MaxDefaultAmmo > 0;
-
+	bHasAmmo = MaxDefaultAmmo > 0, MagazineAmmo > 0;
+	
 	// Change with ammo pickup
-	MaxAmmo = 90, MaxDefaultAmmo;
-	UE_LOG(LogTemp, Warning, TEXT("Max Ammo is %d"), MaxAmmo);
+	//MaxAmmo = 90, MaxDefaultAmmo;
+	//UE_LOG(LogTemp, Warning, TEXT("Max Ammo is %d"), MaxAmmo);
 
 	if (bWantstoFire == true && bIsFiring == false) 
 	{
 		if (bHasAmmo) 
 		{
-			MaxDefaultAmmo = MaxDefaultAmmo - AmmoUse;
-			UE_LOG(LogTemp, Warning, TEXT("Player Ammo is %d"), );
 
+			MagazineAmmo = MagazineAmmo - AmmoUse;
+			MaxDefaultAmmo = MaxDefaultAmmo - AmmoUse;
+
+			UE_LOG(LogTemp, Warning, TEXT("Player Magazine Ammo is : %d"), MagazineAmmo);
+			UE_LOG(LogTemp, Error, TEXT("Player Inventory Ammo is %d"), MaxDefaultAmmo);
 
 			FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
@@ -382,26 +381,31 @@ void APlayerCharacter::OnShotGunFire()
 void APlayerCharacter::ManualReload()
 {
 
-	UE_LOG(LogTemp, Error, TEXT("Reload"));
+	UE_LOG(LogTemp, Error, TEXT("Reloading"));
+	MagazineAmmo = MaxDefaultAmmo - MagazineAmmo;
+	MaxDefaultAmmo = FMath::Clamp(MagazineAmmo, 0.0f, MaxAmmo);
 
 }
 
 void APlayerCharacter::SwitchWeapon()
 {
 	UE_LOG(LogTemp, Error, TEXT("Switch"));
-	//APlayerCharacter* Owner = this;
-	//if (CheckWeaponIndex.Num() != 0) 
-	//{
-		
-	//}
+	
 
 }
 
-
-int APlayerCharacter::CalculateAmmo(int _ammoAmount)
+void APlayerCharacter::UseAmmo() 
 {
-	return 0;
+	MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
 }
+
+//void APlayerCharacter::CalculateAmmo(int MagazineUse)
+//{
+
+	//MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
+
+	
+//}
 
 
 
@@ -411,7 +415,7 @@ void APlayerCharacter::ZoomIn()
 
 	if (bIsZoomedin) {
 		CameraComp->SetFieldOfView(70.f);
-		CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
+		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
 		UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
 	}
 	else if (!bIsZoomedin) 
@@ -426,7 +430,7 @@ void APlayerCharacter::ZoomOut()
 
 	if (!bIsZoomedin) {
 		CameraComp->SetFieldOfView(90.f);
-		CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
+		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
 		UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
 	}
 	else 
@@ -443,7 +447,7 @@ void APlayerCharacter::ZoomOut()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	CheckBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin);
+	CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin);
 }
 
 

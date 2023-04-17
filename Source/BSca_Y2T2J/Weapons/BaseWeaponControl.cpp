@@ -4,6 +4,7 @@
 #include "Weapons/BaseWeaponControl.h"
 #include "Components/SphereComponent.h"
 #include "PlayerClass\PlayerCharacter.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 ABaseWeaponControl::ABaseWeaponControl()
@@ -19,6 +20,8 @@ ABaseWeaponControl::ABaseWeaponControl()
 
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	Muzzle->SetupAttachment(SkeletalMesh);
+
+	bIsWeapon = true;
 
 }
 
@@ -39,11 +42,31 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 
 }
 
+//void ABaseWeaponControl::CheckWeapon(bool Rifle, bool ShotGun) {
+//}
+
 void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 {
 	if (PlayerRefrence) 
 	{
-		
+		if (bIsWeapon)
+		{
+			if (bIsRifle) {
+				const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("RifleHandSocket");
+				if (Socket) {
+					Socket->AttachActor(this, PlayerRefrence->GetMesh());
+					PlayerRefrence->SetEquippedWeapon(this);
+					UE_LOG(LogTemp, Warning, TEXT("Rifle Equip"));
+				}
+			} else if (bIsShotGun){
+				const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("ShotGunHandSocket");
+				if (Socket) {
+					Socket->AttachActor(this, PlayerRefrence->GetMesh());
+					PlayerRefrence->SetEquippedWeapon(this);
+					UE_LOG(LogTemp, Warning, TEXT("Shotgun Equip"));
+				}
+			}
+		}
 	}
 
 }
@@ -57,7 +80,6 @@ void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Pickup"));
 	Destroy();
 }
 
