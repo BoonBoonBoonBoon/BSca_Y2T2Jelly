@@ -79,11 +79,10 @@ void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 			Equip(PlayerRef);
 		}
 	}
-
-	Destroy();
 }
 
 void ABaseWeaponControl::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	Destroy();
 }
 

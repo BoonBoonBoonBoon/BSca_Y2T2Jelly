@@ -398,8 +398,9 @@ void APlayerCharacter::ManualReload()
 				int InventoryAmmoStorage = MaxDefaultAmmo;
 
 			// NewMagazine Cannot Go higher or lower than 30 and zero. - MagContainer cannot go below 0 and higher than 30, add Whatever value inventory ammo has inbetween 0/30
-				int NewMagazine = FMath::Clamp(NewMagazine + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
-
+				int NewMagazine = FMath::Clamp(MagazineAmmo + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
+				//int NewMagazine = FMath::Clamp(MagazineAmmo + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
+				// 
 			// Taking away a whole mag from Ammo inventory (Subtract 30 from the DefAmmo Int (0 to 90))
 				MaxDefaultAmmo = FMath::Clamp(MaxDefaultAmmo - NewMagazine, 0.f, MaxAmmo);
 
