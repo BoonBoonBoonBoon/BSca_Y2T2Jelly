@@ -113,10 +113,10 @@ APlayerCharacter::APlayerCharacter()
 	//Health = DefaultHealth;
 	
 	// Ammo & Firing.
-	AmmoUse = 1;
-	MaxDefaultAmmo = 90;
+	RifleAmmoUse = 1;
+	MaxInventoryAmmo = 90;
 	// Sets the max amount of ammmo in inv
-	MaxAmmo = MaxDefaultAmmo;
+	MaxAmmo = MaxInventoryAmmo;
 
 	MagazineAmmo = 30;
 	// Sets the max Amount of ammo in mag
@@ -125,6 +125,7 @@ APlayerCharacter::APlayerCharacter()
 	bHasAmmo = false; 
 	bWantstoFire = false; 
 	bIsFiring = false; 
+	bIsReloading = false;
 	bIsRifle = false;
 	bIsShotgun = false;
 
@@ -134,13 +135,12 @@ APlayerCharacter::APlayerCharacter()
 	ZoomCrouchSpeed = 180.f;
 }
 
+
 void APlayerCharacter::CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom) 
 {
 	if (bIsRunning == true && bIsZoomedin)
 	{
-		
 		GetCharacterMovement()->MaxWalkSpeed = 600.f;
-		
 	}
 	else if (bIsWalking == true && !bIsRunning && bIsZoomedin)
 	{ 
@@ -166,18 +166,11 @@ void APlayerCharacter::CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool
 
 void APlayerCharacter::MoveVer(float Value)
 {
-	//if (bIsZoomedin) 
-	
-		//int WalkTemp = WalkSpeedAvg - 400;
-		//GetCharacterMovement()->MaxWalkSpeed = WalkTemp;
-		//AddMovementInput(GetActorForwardVector(), Value);
 	CheckMovementBooleans(true, NULL, NULL, NULL, bIsZoomedin);
 	bIsWalking = true;
 	if (bIsWalking) {
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
-		
-	
 }
 
 void APlayerCharacter::MoveHor(float Value)
@@ -201,15 +194,8 @@ void APlayerCharacter::MoveHor(float Value)
 	}
 }
 
-//https://www.dropbox.com/sh/po5yga1oke4n58j/AAC7kfAWBpg_Th8mLb7ZorPQa?dl=0
-
-
 void APlayerCharacter::Run()
 {
-	/** Character changes to walkspeed when calling sprint method while its crouching
-	* @see RunEnd method.
-	*
-	**/
 	CheckMovementBooleans(NULL, true, NULL, NULL, bIsZoomedin);
 
 	bIsRunning = true;
@@ -229,11 +215,6 @@ void APlayerCharacter::RunEnd()
 
 	if (!bIsRunning && !bIsZoomedin) 
 	{
-		/**
-		* MWS is AChar,
-		* accessor needs to access class variables.
-		* WSA Then used as temp data storage.
-		*/
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
 	}
 	else 
@@ -246,29 +227,18 @@ void APlayerCharacter::RunEnd()
 
 void APlayerCharacter::StartJump()
 {
-	/**
-	* Once method starts on the stack checks to see if bJuming is true
-	* On true, Call AChar Jump method, Change height for higher of lower jump status. 
-	* @see JumpZ
-	* If false return AChar SJ Method 
-	*/
-
 	GetCharacterMovement()->JumpZVelocity = JumpHeight;
 	Jump();
-		
-
 }
 
 void APlayerCharacter::JumpEnd()
 {
 	StopJumping();
-	
 }
 
 
 void APlayerCharacter::StartCrouch()
 {
-
 	CheckMovementBooleans(NULL, NULL, true, NULL, bIsZoomedin);
 
 	bIsCrouched = true;
@@ -283,8 +253,6 @@ void APlayerCharacter::StartCrouch()
 	{
 		EndCrouch();
 	}
-	
-	
 }
 
 void APlayerCharacter::EndCrouch()
@@ -326,19 +294,11 @@ void APlayerCharacter::Idle()
 
 void APlayerCharacter::OnBasicFire()
 {
-	/**
-	To check if we can pickup anything to begin with we need to check if the max ammo has been hit
-	So we need a max ammo var & if we are firing.
-	and a if we want to fire var.
-	*/
-	
-
 	bWantstoFire = true;
 	bIsFiring = false;
-
-	bHasInvAmmo = MaxDefaultAmmo > 0;
+	bHasInvAmmo = MaxInventoryAmmo > 0;
 	bHasMagAmmo = MagazineAmmo > 0;
-	bHasAmmo = MaxDefaultAmmo > 0, MagazineAmmo > 0;
+	bHasAmmo = MaxInventoryAmmo > 0, MagazineAmmo > 0;
 
 	if (bWantstoFire && !bIsFiring ) 
 	{
@@ -367,12 +327,6 @@ void APlayerCharacter::OnBasicFire()
 			}
 
 	}
-	
-	//PickUpAmmo* AmmoPtr{};
-	//AmmoPtr->OnOverlapBegin(GetCapsuleComponent(), );
-	//UE_LOG(LogTemp, Error, TEXT("Player Now Has %d Amount of Ammo"), DefaultAmmo);
-	//onactorhit destroy
-	//FHitResult
 }
 
 void APlayerCharacter::OnShotGunFire()
@@ -382,57 +336,48 @@ void APlayerCharacter::OnShotGunFire()
 void APlayerCharacter::ManualReload()
 {
 	if (bHasInvAmmo) {
+
 		int MagAmmoStorage = 0;
-		//int NewMagazine = 0;
-		//int DefammoRef = 0;
 		UE_LOG(LogTemp, Error, TEXT("Reloading"));
+		bIsReloading = true;
 
-		
-			// Store Magazine ammo value (Int Between 0 to 30)
+		if (bIsReloading) {		
+				// Store Magazine ammo value (Int Between 0 to 30) 30
 				MagAmmoStorage = MagazineAmmo;
-		
-			// reduce ammo to zero (Empty The Mag)
+				// reduce ammo to zero (Empty The Mag) 0
 				MagazineAmmo = 0;
-		
-			// Store inventory ammo value (Int Between 0 to 90)
-				int InventoryAmmoStorage = MaxDefaultAmmo;
-
-			// NewMagazine Cannot Go higher or lower than 30 and zero. - MagContainer cannot go below 0 and higher than 30, add Whatever value inventory ammo has inbetween 0/30
-				int NewMagazine = FMath::Clamp(MagazineAmmo + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
-				//int NewMagazine = FMath::Clamp(MagazineAmmo + MaxDefaultAmmo, 0.f, MaxDefaultMagazineAmmo);
-				// 
-			// Taking away a whole mag from Ammo inventory (Subtract 30 from the DefAmmo Int (0 to 90))
-				MaxDefaultAmmo = FMath::Clamp(MaxDefaultAmmo - NewMagazine, 0.f, MaxAmmo);
-
-			// Refill the Magazine to full (30 - 0)
+				// Store inventory ammo value (Int Between 0 to 90) 90
+				int InventoryAmmoStorage = MaxInventoryAmmo;
+				// NewMagazine Cannot Go higher or lower than 30 and zero. - MagContainer cannot go below 0 and higher than 30, add Whatever value inventory ammo has inbetween 0/30
+				int NewMagazine = FMath::Clamp(MagazineAmmo + MaxInventoryAmmo, 0, MaxDefaultMagazineAmmo);
+				// Taking away a whole mag from Ammo inventory (Subtract 30 from the DefAmmo Int (0 to 90))
+				MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo - NewMagazine, 0, MaxAmmo);
+				// Refill the Magazine to full (30 - 0)
 				MagazineAmmo = NewMagazine;
-
-			// Redistribute the original amount of ammo from magazineAmmo
-				MaxDefaultAmmo = MagAmmoStorage;
-				
-				// MagazineAmmo = MagazineAmmo + NewMagazine;
-			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Magazine Ammo is now at %d"), MagazineAmmo);
-			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Invetory Ammo is now at %d"), MaxDefaultAmmo);
+				// Redistribute the original amount of ammo from magazineAmmo
+				MaxInventoryAmmo = MaxInventoryAmmo + MagAmmoStorage;
+			
+		}
+			//else if (MaxInventoryAmmo <= 30 && MagazineAmmo > 0)
+			//{
+				//for (int i = 0; i < 30; i++) {
+					//for (int j = 0; j < 30; j--) {
+					//	MagazineAmmo = i;
+					//	MaxInventoryAmmo = j;
+					//}
+				//}		
 	}
 	else {
 		
 		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
 		
 	}
+}
 
-	
-	
-	//MaxDefaultAmmo = MagazineAmmo - 30 - MaxDefaultAmmo;
-	//UE_LOG(LogTemp, Warning, TEXT("Player Magazine Ammo is : %d"), MaxDefaultAmmo);
-	
-	// Calculate ammo 
-	//CalculateAmmo(30, MagazineAmmo);
-
-	//MaxDefaultAmmo = FMath::Clamp(MagazineAmmo - 30, 0.0f, MaxAmmo);
-	
-
-	
-
+void APlayerCharacter::CheckAmmoPickup(int Ammo)
+{
+	MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
+	UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets"), Ammo);
 }
 
 void APlayerCharacter::SwitchWeapon()
@@ -445,22 +390,13 @@ void APlayerCharacter::SwitchWeapon()
 void APlayerCharacter::UseAmmo() 
 {
 	if (bHasMagAmmo) {
-		MagazineAmmo = FMath::Clamp(MagazineAmmo - AmmoUse, 0.0f, MaxDefaultMagazineAmmo);
+		MagazineAmmo = FMath::Clamp(MagazineAmmo - RifleAmmoUse, 0.0f, MaxDefaultMagazineAmmo);
 		UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
-
-			//if (bHasInvAmmo) {
-				//MaxDefaultAmmo = FMath::Clamp(MaxDefaultAmmo - AmmoUse, 0.0f, MaxAmmo);
-				//UE_LOG(LogTemp, Error, TEXT("Player inventory Ammo is : %d"), MaxDefaultAmmo)}
 	} 
 }
 
 
-//int APlayerCharacter::CalculateAmmo(int AmmoInUse, int AmmoToTakeAway)
-//{
-//	return;
-//}
-
-
+// Called When Character Is In Focus.
 void APlayerCharacter::ZoomIn()
 {
 	bIsZoomedin = true;
@@ -475,7 +411,6 @@ void APlayerCharacter::ZoomIn()
 		ZoomOut();
 	}
 }
-
 void APlayerCharacter::ZoomOut() 
 {
 	bIsZoomedin = false;
@@ -527,8 +462,6 @@ void APlayerCharacter::BeginPlay()
 
 void APlayerCharacter::IncreaseHealth_Implementation()
 {
-	//IncreaseHealthPtr->Regen = 20.f;
-	//IncreaseHealthPtr->Health = FMath::Clamp(IncreaseHealthPtr->Health + IncreaseHealthPtr->Regen, 0.0f, IncreaseHealthPtr->DefaultHealth);
 }
 void APlayerCharacter::OnStaminaUse_Implementation()
 {
@@ -559,8 +492,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveVer", this, &APlayerCharacter::MoveVer);
 	PlayerInputComponent->BindAxis("MoveHor", this, &APlayerCharacter::MoveHor);
 
-	// ... Camera Yaw and Pitch Control
-
 	/** Use of APawn since the method AddCYI is not a Construct of APlayerChar
 	* @see LookPitch */
 	PlayerInputComponent->BindAxis("Look Yaw", this, &APawn::AddControllerYawInput);
@@ -575,7 +506,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::StartCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
 
-	// bind fire events
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnBasicFire);
 	PlayerInputComponent->BindAction("ManualReload", IE_Pressed, this, &APlayerCharacter::ManualReload);
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &APlayerCharacter::SwitchWeapon);

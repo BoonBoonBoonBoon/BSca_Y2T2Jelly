@@ -17,9 +17,9 @@ class BSCA_Y2T2J_API APickUpAmmo : public APickUpBase
 
 public:
 	
-	int AmmoAmount;
+	int AmmoAmount = 30;
 
-	void SetAmmo(float ammo);
+	void SetAmmo();
 
 	// @see Override
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

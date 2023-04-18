@@ -78,20 +78,36 @@ public:
 	float RunSpeedTemp;
 
 	// Firing Variables
-	int MaxDefaultAmmo; // Max amount of useable ammo, can be manipulated.
-	int MaxAmmo = 90; // Max Set ammo, Cannot be manipulated.
+	// Max amount of useable ammo, can be manipulated
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxInventoryAmmo; 
+	// Max Set ammo, Cannot be manipulated.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxAmmo = 90; 
 
-	int MagazineAmmo; // Useable ammo in the magazine.
-	int MaxDefaultMagazineAmmo = 30; // Max Ammo in a magazine, 30.
+	// Useable ammo in the magazine.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MagazineAmmo; 
+	// Max Ammo in a magazine, 30.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxDefaultMagazineAmmo = 30; 
 	
 
-	int AmmoUse; // Bullets used, for rifle would be 1 per call, but shotgun would be 3 - 5.
+	// Rifle Variables. 
+	int RifleAmmoUse;
+	int RifleAmmoDamage;
 
+	// Check Current Ammo.
 	bool bHasMagAmmo;
 	bool bHasInvAmmo;
-	bool bHasAmmo; // checks ammo
-	bool bWantstoFire; // checks if it CAN fire
-	bool bIsFiring; // checks if it IS firing
+	bool bHasAmmo; 
+
+	// Check Firing opportunity. 
+	bool bWantstoFire; 
+	bool bIsFiring; 
+
+	// Check Status of Weapon.
+	bool bIsReloading;
 	bool bIsRifle;
 	bool bIsShotgun;
 	
@@ -118,24 +134,22 @@ public:
 		void CameraSpin_Implementation();
 
 		UFUNCTION() // ... Dynamic binding
-			void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+			//void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 			void CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
-
-		// Weapons
-
 
 		UFUNCTION()
 			void OnBasicFire(); // changed name from onriflefire, will be used as boilerplate as the rifle.
 			void OnShotGunFire(); // shotgun params
 
-		void ManualReload();
-		
+		void CheckAmmoPickup(int Ammo);
+		// Depletion of Ammo stock.
 		void UseAmmo();
-
+		// Reload Magazine (R).
+		void ManualReload();
+		// Switch Input (F).
 		void SwitchWeapon();
 
 
-		// Equip Weapon
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
 		class ABaseWeaponControl* EquippedWeapon;
 
@@ -143,19 +157,18 @@ public:
 		FORCEINLINE ABaseWeaponControl* GetEquippedWeapon() { return EquippedWeapon; }
 		FORCEINLINE void SetEquippedWeapon(ABaseWeaponControl* WeaponRefrence) { EquippedWeapon = WeaponRefrence; }
 
-		// Weapon Array
+		// Weapon Index.
 		UPROPERTY()
 		TArray<ABaseWeaponControl*> CheckWeaponIndex;
 
-
-		// Calculate the ammo in the magazine.
-		//int CalculateAmmo(int AmmoInUse, int AmmoToTakeAway);
-
-		// zoom types
+		// Focus Functions.
 		void ZoomIn();
 		void ZoomOut();
 
+		// Check State of focus.
 		bool bIsZoomedin;
+
+		// Focus Speed Values.
 		int ZoomWalkSpeed;
 		int ZoomRunSpeed;
 		int ZoomCrouchSpeed;
