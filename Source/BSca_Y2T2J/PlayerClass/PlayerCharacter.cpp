@@ -41,19 +41,17 @@ APlayerCharacter::APlayerCharacter()
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(TEXT("StaminaComp"));
 
-
 	/** Attached Subobjects */
 	SpringArmComp->SetupAttachment(RootComponent);
 	// Accessor needs to close off heirarchy. 
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->SetFieldOfView(90.f);
 
-	// Camera Lag Speed
+	/* Camera Boom Values */
 	SpringArmComp->bEnableCameraLag = true;
 	SpringArmComp->bEnableCameraRotationLag = true;
 	SpringArmComp->CameraLagSpeed = 4.f;
 	SpringArmComp->CameraRotationLagSpeed = 4.f;
-
 
 	/** Set Absoulte is opposite of Set relative
 	* @see SetRelative
@@ -61,7 +59,6 @@ APlayerCharacter::APlayerCharacter()
 	* otherwise specifed. */
 	SpringArmComp->SetUsingAbsoluteRotation(false);
 	SpringArmComp->TargetArmLength = 300.f;
-
 
 	/**
 	* if True. Rotatoes the pitch and yaw of the body
@@ -84,14 +81,9 @@ APlayerCharacter::APlayerCharacter()
 	WalkSpeedAvg = 500.f;
 	RunSpeed = 1200.f;
 	RunSpeedTemp = 1200.f;
+
 	// XAxis turn Speed
 	TurnSpeed = 0.5f;
-
-	// Pickup Values
-	RunSpeedPickup = 2000.f;
-	JumpHeightPickup = 1000.f;
-
-	// Sprinting jumpVelocity = (normaljump + or - "int");
 
 	// Crouch Values
 	CrouchSpeed = 250.f;
@@ -109,9 +101,6 @@ APlayerCharacter::APlayerCharacter()
 	bShouldRotate = false;
 	RotationRate = 90.f;
 
-	//DefaultHealth = 100.f;
-	//Health = DefaultHealth;
-	
 	// Ammo & Firing.
 	RifleAmmoUse = 1;
 	MaxInventoryAmmo = 90;
@@ -123,7 +112,7 @@ APlayerCharacter::APlayerCharacter()
 	MaxDefaultMagazineAmmo = MagazineAmmo; 
 
 	bHasAmmo = false; 
-	bWantstoFire = false; 
+	bWantstoFire = true; 
 	bIsFiring = false; 
 	bIsReloading = false;
 	bIsRifle = false;
@@ -133,6 +122,10 @@ APlayerCharacter::APlayerCharacter()
 	ZoomWalkSpeed = 250.f;
 	ZoomRunSpeed = 600.f;
 	ZoomCrouchSpeed = 180.f;
+
+	/* Reserve 3 spaces before array has to resize */
+	CheckWeaponMeshIndex.Reserve(3);
+	
 }
 
 
@@ -197,7 +190,6 @@ void APlayerCharacter::MoveHor(float Value)
 void APlayerCharacter::Run()
 {
 	CheckMovementBooleans(NULL, true, NULL, NULL, bIsZoomedin);
-
 	bIsRunning = true;
 	if (bIsRunning == true && bIsZoomedin == false) 
 	{
@@ -212,7 +204,6 @@ void APlayerCharacter::Run()
 void APlayerCharacter::RunEnd()
 {
 	bIsRunning = false;
-
 	if (!bIsRunning && !bIsZoomedin) 
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
@@ -240,7 +231,6 @@ void APlayerCharacter::JumpEnd()
 void APlayerCharacter::StartCrouch()
 {
 	CheckMovementBooleans(NULL, NULL, true, NULL, bIsZoomedin);
-
 	bIsCrouched = true;
 	if (bIsZoomedin == true && bIsCrouched == false) 
 	{
@@ -257,9 +247,7 @@ void APlayerCharacter::StartCrouch()
 
 void APlayerCharacter::EndCrouch()
 {
-
 	bIsCrouched = false;
-
 	if (!bIsCrouched) 
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeedAvg;
@@ -271,7 +259,6 @@ void APlayerCharacter::EndCrouch()
 	{
 		bIsRunning = false;
 	}
-
 }
 
 
@@ -279,19 +266,7 @@ void APlayerCharacter::EndCrouch()
 						//// Ineractions
 
 
-void APlayerCharacter::Idle()
-{
-	// @See TimerFunction
-	/** SetTimer First Set TimerHandle.
-	* this. Context Actor for location.
-	* Grab timer method.
-	* inRate how often it shows on screen
-	* Checks if loop
-	* firs delay
-	*/
-	//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::TimerFunction, 2.0f, true, 1.f);
-}
-
+/* Weapon Class Specific Rifle functionality*/
 void APlayerCharacter::OnBasicFire()
 {
 	bWantstoFire = true;
@@ -307,7 +282,6 @@ void APlayerCharacter::OnBasicFire()
 			bIsFiring = true;
 			UseAmmo();
 		
-
 			FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
 			FVector ForwardVector = CameraComp->GetForwardVector();
@@ -315,33 +289,32 @@ void APlayerCharacter::OnBasicFire()
 			FCollisionQueryParams CollisionParam;
 			bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
 
-			if (bHit)
-			{
+			if (bHit) {
 				DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
 				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
 			}
-
 		} else {
 			UE_LOG(LogTemp, Error, TEXT("OnFire) Player has ran out of Ammo for the Magazine!"));
 			return;
-			}
-
+		}
 	}
 }
 
+/* Weapon Class Specific Shotgun functionality*/
 void APlayerCharacter::OnShotGunFire()
 {
 }
 
+/* Player Input for Manual Reload */
 void APlayerCharacter::ManualReload()
 {
+		// keep in mind bool wantto and canfire
 	if (bHasInvAmmo) {
-
-		int MagAmmoStorage = 0;
-		UE_LOG(LogTemp, Error, TEXT("Reloading"));
-		bIsReloading = true;
-
-		if (bIsReloading) {		
+			int MagAmmoStorage = 0;
+			UE_LOG(LogTemp, Error, TEXT("Reloading"));
+			bIsReloading = true;
+			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false, 3);
+			if (bIsReloading) {
 				// Store Magazine ammo value (Int Between 0 to 30) 30
 				MagAmmoStorage = MagazineAmmo;
 				// reduce ammo to zero (Empty The Mag) 0
@@ -356,42 +329,39 @@ void APlayerCharacter::ManualReload()
 				MagazineAmmo = NewMagazine;
 				// Redistribute the original amount of ammo from magazineAmmo
 				MaxInventoryAmmo = MaxInventoryAmmo + MagAmmoStorage;
-			
-		}
-			//else if (MaxInventoryAmmo <= 30 && MagazineAmmo > 0)
-			//{
-				//for (int i = 0; i < 30; i++) {
-					//for (int j = 0; j < 30; j--) {
-					//	MagazineAmmo = i;
-					//	MaxInventoryAmmo = j;
-					//}
-				//}		
-	}
-	else {
-		
-		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
-		
+
+			} else {
+			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
+			}
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
 	}
 }
 
+/* Calculates if Ammo can be inherited */
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
 {
 	MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
 	UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets"), Ammo);
 }
 
+/* Changes Weapon Index */
 void APlayerCharacter::SwitchWeapon()
 {
-	UE_LOG(LogTemp, Error, TEXT("Switch"));
-	
+	/* Only fire off if we have something in the array
+	so if its greater than zero*/
+	if(CheckWeaponMeshIndex.Num() > 0){
+		//UE_LOG(LogTemp, Error, TEXT("Switch"));
+	}
 
 }
 
+/* Subtracts Ammo*/
 void APlayerCharacter::UseAmmo() 
 {
 	if (bHasMagAmmo) {
 		MagazineAmmo = FMath::Clamp(MagazineAmmo - RifleAmmoUse, 0.0f, MaxDefaultMagazineAmmo);
-		UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
+		//UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
 	} 
 }
 
@@ -443,7 +413,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
-
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
 	{
@@ -453,7 +422,6 @@ void APlayerCharacter::BeginPlay()
 			PlayerController->PlayerCameraManager->ViewPitchMax = 30.0;
 		}
 	} 
-
 }
 
 
@@ -470,17 +438,15 @@ void APlayerCharacter::CameraSpin_Implementation()
 {
 }
 
-void APlayerCharacter::TimerFunction()
+void APlayerCharacter::ResetFire()
 {
-	// Timer Handle for Camera Rotation
-	/*
-	CallTracker--;
-	if (CallTracker == 0)
-	{GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle"));
-	GetWorldTimerManager().ClearTimer(TimerHandle);}
-	else{
-		GEngine->AddOnScreenDebugMessage(0, 150.f, FColor::Yellow, TEXT("Idle Called but failed"));}
-	*/
+	if (bIsReloading) {
+		bIsReloading = false;
+		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+	}
+	else { 
+		return;
+	}
 }
 
 

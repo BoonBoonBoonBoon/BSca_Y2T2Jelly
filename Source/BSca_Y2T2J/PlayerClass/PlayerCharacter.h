@@ -67,17 +67,18 @@ public:
 		TSubclassOf<AProjectileBase> Projectileptr;
 
 
-	float TurnSpeed;
+	
+	// Check to see current movement.
 	bool bIsRunning;
 	bool bIsJumping;
 	bool bIsWalking;
-	// Pickups 
+	float TurnSpeed;
+
+	// Movement Speed values, changes speed value.
 	float RunSpeedPickup;
-	float JumpHeightPickup;
-	// (TEMP) 
+	float JumpHeightPickup; 
 	float RunSpeedTemp;
 
-	// Firing Variables
 	// Max amount of useable ammo, can be manipulated
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int MaxInventoryAmmo; 
@@ -92,6 +93,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int MaxDefaultMagazineAmmo = 30; 
 	
+	// Speed at which a weapon can fire.
+	int fireRate;
 
 	// Rifle Variables. 
 	int RifleAmmoUse;
@@ -102,9 +105,7 @@ public:
 	bool bHasInvAmmo;
 	bool bHasAmmo; 
 
-	// Check Firing opportunity. 
-	bool bWantstoFire; 
-	bool bIsFiring; 
+	
 
 	// Check Status of Weapon.
 	bool bIsReloading;
@@ -157,9 +158,9 @@ public:
 		FORCEINLINE ABaseWeaponControl* GetEquippedWeapon() { return EquippedWeapon; }
 		FORCEINLINE void SetEquippedWeapon(ABaseWeaponControl* WeaponRefrence) { EquippedWeapon = WeaponRefrence; }
 
-		// Weapon Index.
+		/*Store in the array the pointers to the weapons we spawn with the name checkweapon*/
 		UPROPERTY()
-		TArray<ABaseWeaponControl*> CheckWeaponIndex;
+		TArray<ABaseWeaponControl*> CheckWeaponMeshIndex;
 
 		// Focus Functions.
 		void ZoomIn();
@@ -211,10 +212,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Timer Function
-	void TimerFunction();
+	void ResetFire();
 
-	// Timer Handle (For Control). 
-	FTimerHandle TimerHandle;
+	// Handles Delay inbetween shots.
+	FTimerHandle FireDelayTimerHandle;
+
+	// Check Firing opportunity. 
+	bool bWantstoFire;
+	bool bIsFiring;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

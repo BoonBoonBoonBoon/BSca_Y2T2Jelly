@@ -29,7 +29,7 @@ ABaseWeaponControl::ABaseWeaponControl()
 void ABaseWeaponControl::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -42,47 +42,53 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 
 }
 
-//void ABaseWeaponControl::CheckWeapon(bool Rifle, bool ShotGun) {
-//}
-
 void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 {
-	if (PlayerRefrence) 
+	if (PlayerRefrence)
 	{
-		if (bIsWeapon)
-		{
+		
+		if (PlayerRefrence->CheckWeaponMeshIndex.Num() <= 2){
 			if (bIsRifle) {
 				const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("RifleHandSocket");
 				if (Socket) {
 					Socket->AttachActor(this, PlayerRefrence->GetMesh());
+
+					/* How we add an element to the array, AddUnique is what tells "this" to be added.
+					* AddUnique is the same as add but it will not allow a replicate in the array and will Return it with a -1.*/
+					PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
+
 					PlayerRefrence->SetEquippedWeapon(this);
-					UE_LOG(LogTemp, Warning, TEXT("Rifle Equip"));
+					UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 				}
-			} else if (bIsShotGun){
+			}
+			else if (bIsShotGun) {
 				const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("ShotGunHandSocket");
 				if (Socket) {
 					Socket->AttachActor(this, PlayerRefrence->GetMesh());
+					PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 					PlayerRefrence->SetEquippedWeapon(this);
-					UE_LOG(LogTemp, Warning, TEXT("Shotgun Equip"));
+					UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 				}
 			}
 		}
 	}
-
 }
+
 
 void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor) {
 		APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(OtherActor);
 		if (PlayerRef) {
+			//PlayerRef->CheckWeaponMeshIndex.add
 			Equip(PlayerRef);
 		}
 	}
+	Destroy();
 }
 
 void ABaseWeaponControl::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	Destroy();
+	
 }
 

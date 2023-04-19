@@ -17,7 +17,13 @@ class BSCA_Y2T2J_API APickUpAmmo : public APickUpBase
 
 public:
 	
-	int AmmoAmount = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo Type")
+		bool bIsRifleAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo Type")
+		bool bIShotgunAmmo;
+
+	int RifleAmmoAmount = 30;
 
 	void SetAmmo();
 

@@ -7,23 +7,27 @@
 
 void APickUpAmmo::SetAmmo()
 {
-	//APlayerCharacter* PlayerRef = nullptr;
-	//PlayerRef->MaxInventoryAmmo += AmmoAmount;
+
 
 }
 
 void APickUpAmmo::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor) {
-		APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(OtherActor);
-		if (PlayerRef) {
-			PlayerRef->MaxInventoryAmmo;
-			if (PlayerRef->MaxInventoryAmmo < 90) {
-				PlayerRef->CheckAmmoPickup(AmmoAmount);
-				Destroy();
+		APlayerCharacter* PlayerRefAmmo = Cast<APlayerCharacter>(OtherActor);
+		if (PlayerRefAmmo) {
+			
+			if (bIsRifleAmmo) {
+				if (PlayerRefAmmo->MaxInventoryAmmo < 90) {
+					PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
+					Destroy();
+				}
+				else if (PlayerRefAmmo->MaxInventoryAmmo >= 90) {
+					UE_LOG(LogTemp, Error, TEXT("Inventory Full!"));
+				}
 			}
 			else {
-				UE_LOG(LogTemp, Error, TEXT("Cant pickup ammo!"));
+				UE_LOG(LogTemp, Error, TEXT("Wrong Ammo"));
 			}
 		}
 	}

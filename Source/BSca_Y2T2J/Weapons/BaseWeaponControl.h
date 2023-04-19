@@ -41,9 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
 		bool bIsShotGun;
 
-
-	// leave this for now see how the weapon switch works
-	//void CheckWeapon(bool Rilfe, bool ShotGun);
+	
 	
 	// Muzzle mesh for the weapons. 
 	USceneComponent* Muzzle;
