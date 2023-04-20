@@ -116,8 +116,8 @@ public:
 		virtual void Run();
 		void RunEnd();
 
-	UFUNCTION(BlueprintCallable)
-		void Idle();
+	//UFUNCTION(BlueprintCallable)
+		//void Idle();
 
 	// Widget Health Increase.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
