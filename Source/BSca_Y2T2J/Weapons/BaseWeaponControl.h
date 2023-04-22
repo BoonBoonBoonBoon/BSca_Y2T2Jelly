@@ -23,7 +23,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionVol")
 		class USphereComponent* CollisionVol;
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,6 +40,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
 		bool bIsShotGun;
 
+	bool bRotate;
+	int RotationRate;
 	
 	
 	// Muzzle mesh for the weapons. 

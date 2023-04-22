@@ -41,14 +41,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UHealthComponent* HealthComp;
 
-	
-/*
-	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
-		float DefaultHealth = 100;
-	UPROPERTY(BlueprintReadOnly)
-		float Health = 100;
-	*/
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float WalkSpeedAvg;
@@ -65,7 +57,6 @@ public:
 	// Spawn Projectile.
 	UPROPERTY(EditAnywhere, Category = "TSubClass")
 		TSubclassOf<AProjectileBase> Projectileptr;
-
 
 	
 	// Check to see current movement.
@@ -103,9 +94,8 @@ public:
 	// Check Current Ammo.
 	bool bHasMagAmmo;
 	bool bHasInvAmmo;
-	bool bHasAmmo; 
+	//bool bHasAmmo; 
 
-	
 
 	// Check Status of Weapon.
 	bool bIsReloading;
@@ -116,8 +106,6 @@ public:
 		virtual void Run();
 		void RunEnd();
 
-	//UFUNCTION(BlueprintCallable)
-		//void Idle();
 
 	// Widget Health Increase.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
@@ -135,7 +123,6 @@ public:
 		void CameraSpin_Implementation();
 
 		UFUNCTION() // ... Dynamic binding
-			//void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 			void CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
 
 		UFUNCTION()
@@ -145,8 +132,12 @@ public:
 		void CheckAmmoPickup(int Ammo);
 		// Depletion of Ammo stock.
 		void UseAmmo();
+
 		// Reload Magazine (R).
 		void ManualReload();
+		// Reload Magazine (AU)
+		//void AutomaticReload();
+
 		// Switch Input (F).
 		void SwitchWeapon();
 
@@ -157,6 +148,9 @@ public:
 		// Inline to return a Getter
 		FORCEINLINE ABaseWeaponControl* GetEquippedWeapon() { return EquippedWeapon; }
 		FORCEINLINE void SetEquippedWeapon(ABaseWeaponControl* WeaponRefrence) { EquippedWeapon = WeaponRefrence; }
+
+		// Getter for Automatic Reload.
+		FORCEINLINE void AutomaticReload() { ManualReload(); }
 
 		/*Store in the array the pointers to the weapons we spawn with the name checkweapon*/
 		UPROPERTY()

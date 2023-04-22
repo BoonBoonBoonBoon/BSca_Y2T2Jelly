@@ -45,7 +45,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	// Accessor needs to close off heirarchy. 
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
-	CameraComp->SetFieldOfView(90.f);
+	CameraComp->SetFieldOfView(85.f);
 
 	/* Camera Boom Values */
 	SpringArmComp->bEnableCameraLag = true;
@@ -111,7 +111,7 @@ APlayerCharacter::APlayerCharacter()
 	// Sets the max Amount of ammo in mag
 	MaxDefaultMagazineAmmo = MagazineAmmo; 
 
-	bHasAmmo = false; 
+	//bHasAmmo = false; 
 	bWantstoFire = true; 
 	bIsFiring = false; 
 	bIsReloading = false;
@@ -124,8 +124,10 @@ APlayerCharacter::APlayerCharacter()
 	ZoomCrouchSpeed = 180.f;
 
 	/* Reserve 3 spaces before array has to resize */
-	CheckWeaponMeshIndex.Reserve(3);
+	CheckWeaponMeshIndex.Reserve(2);
 	
+	
+
 }
 
 
@@ -271,21 +273,19 @@ void APlayerCharacter::OnBasicFire()
 {
 	bWantstoFire = true;
 	bIsFiring = false;
-	bHasInvAmmo = MaxInventoryAmmo > 0;
-	bHasMagAmmo = MagazineAmmo > 0;
-	bHasAmmo = MaxInventoryAmmo > 0, MagazineAmmo > 0;
 
 	if (bWantstoFire && !bIsFiring ) 
 	{
-		if (bHasMagAmmo) 
-		{
+
+		 if (bHasMagAmmo) 
+			{
 			bIsFiring = true;
 			UseAmmo();
 		
 			FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
 			FVector ForwardVector = CameraComp->GetForwardVector();
-			FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+			FVector EndLoc((ForwardVector * 4500.f) + StartLoc);
 			FCollisionQueryParams CollisionParam;
 			bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
 
@@ -294,8 +294,7 @@ void APlayerCharacter::OnBasicFire()
 				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
 			}
 		} else {
-			UE_LOG(LogTemp, Error, TEXT("OnFire) Player has ran out of Ammo for the Magazine!"));
-			return;
+			UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
 		}
 	}
 }
@@ -303,6 +302,7 @@ void APlayerCharacter::OnBasicFire()
 /* Weapon Class Specific Shotgun functionality*/
 void APlayerCharacter::OnShotGunFire()
 {
+	UE_LOG(LogTemp, Error, TEXT("Shotgun Shoots!"));
 }
 
 /* Player Input for Manual Reload */
@@ -310,26 +310,63 @@ void APlayerCharacter::ManualReload()
 {
 		// keep in mind bool wantto and canfire
 	if (bHasInvAmmo) {
-			int MagAmmoStorage = 0;
+			int LeftOvers = 0;
 			UE_LOG(LogTemp, Error, TEXT("Reloading"));
 			bIsReloading = true;
-			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false, 3);
+			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false);
 			if (bIsReloading) {
-				// Store Magazine ammo value (Int Between 0 to 30) 30
-				MagAmmoStorage = MagazineAmmo;
-				// reduce ammo to zero (Empty The Mag) 0
-				MagazineAmmo = 0;
-				// Store inventory ammo value (Int Between 0 to 90) 90
-				int InventoryAmmoStorage = MaxInventoryAmmo;
-				// NewMagazine Cannot Go higher or lower than 30 and zero. - MagContainer cannot go below 0 and higher than 30, add Whatever value inventory ammo has inbetween 0/30
-				int NewMagazine = FMath::Clamp(MagazineAmmo + MaxInventoryAmmo, 0, MaxDefaultMagazineAmmo);
-				// Taking away a whole mag from Ammo inventory (Subtract 30 from the DefAmmo Int (0 to 90))
-				MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo - NewMagazine, 0, MaxAmmo);
-				// Refill the Magazine to full (30 - 0)
-				MagazineAmmo = NewMagazine;
-				// Redistribute the original amount of ammo from magazineAmmo
-				MaxInventoryAmmo = MaxInventoryAmmo + MagAmmoStorage;
+				// fmath min gets the difference of number say if you have 5 and 10 will return 5.
+				int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
+				MagazineAmmo += ReloadAmount;
+				MaxInventoryAmmo -= ReloadAmount;
 
+				/*
+				* 
+				* 
+				* Add random offset + every unit the bullet travels 
+				* fhit function
+				* Lookup Normalized vectors
+				*
+				* fhitresult - impact normal, turn the impact normal into spread.
+				* 
+				FHitResult FHit;
+				FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+				FVector ForwardVector = CameraComp->GetForwardVector();
+				FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+				FCollisionQueryParams CollisionParam;
+				bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+
+				// get the distance from the tracestart to the location in the world space.
+				float dist = FHit.Distance;
+				// how many units it should spread.
+				float spread = 5.f;
+				// ?? maybe the offset?
+				float falloff = 100.f;
+
+				// if there is a hit, get world location where moving shape would end up against the impacted object
+				fvector newhit = fhit.location
+					// find the normal of the hit location, so you know what axes to spread across
+				for (int shot = 0; shot < numofbullets; ++shot)
+				{
+					// need to get the xyz because we cant just have it on one world axis
+					float newhitoffsetY = (dist / falloff) * spread;
+					float newhitoffsetZ = (dist / falloff) * spread;
+
+					// RAND range generates a randim number inbetween a range (float InMin, float InMax)
+					newhit.y += fmath::randrange(-newhitoffsety, newhitoffsety)
+					newhit.z += fmath::randrange(-newhitoffsetz, newhitoffsetz)
+					
+
+					FHitResult FHit;
+					FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+					// look up use links 
+					float direction = FMath::Normalize(newhit - StartLoc);
+					FVector EndLoc(StartLoc + (direction * 2500.f));
+					FCollisionQueryParams CollisionParam;
+					bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+				}
+
+				*/
 			} else {
 			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
 			}
@@ -338,22 +375,50 @@ void APlayerCharacter::ManualReload()
 	}
 }
 
+
+
 /* Calculates if Ammo can be inherited */
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
 {
-	MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
-	UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets"), Ammo);
+	if (!bHasMagAmmo && !bHasInvAmmo) {
+		MagazineAmmo =+ Ammo;
+		UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for mag"), Ammo);
+	}
+	else {
+		MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for inv"), Ammo);
+	}
 }
 
 /* Changes Weapon Index */
 void APlayerCharacter::SwitchWeapon()
 {
-	/* Only fire off if we have something in the array
-	so if its greater than zero*/
-	if(CheckWeaponMeshIndex.Num() > 0){
-		//UE_LOG(LogTemp, Error, TEXT("Switch"));
-	}
+	APlayerCharacter* PlayerRef = this;
 
+	// Check if the amount of elements is greater than zero
+	if (CheckWeaponMeshIndex.Num() > 0) {
+
+			// increase the array by one
+		for (int i = 0; i < CheckWeaponMeshIndex.Num(); i++) {
+
+			// if the number in the array is equal too the socket number 
+			if (CheckWeaponMeshIndex[i] == GetEquippedWeapon()) {
+
+		
+				int CurrentWeaponIndex = i;
+				int NewWeaponIndex = CurrentWeaponIndex++;
+				int PreviousIndex = CurrentWeaponIndex--;
+
+
+				if (NewWeaponIndex >= CheckWeaponMeshIndex.Num()) {
+					NewWeaponIndex = 0;
+				}
+			}
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
+	}
 }
 
 /* Subtracts Ammo*/
@@ -370,9 +435,9 @@ void APlayerCharacter::UseAmmo()
 void APlayerCharacter::ZoomIn()
 {
 	bIsZoomedin = true;
-
+	//70
 	if (bIsZoomedin) {
-		CameraComp->SetFieldOfView(70.f);
+		CameraComp->SetFieldOfView(70);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
 		UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
 	}
@@ -386,7 +451,7 @@ void APlayerCharacter::ZoomOut()
 	bIsZoomedin = false;
 
 	if (!bIsZoomedin) {
-		CameraComp->SetFieldOfView(90.f);
+		CameraComp->SetFieldOfView(90);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
 		UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
 	}
@@ -405,6 +470,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin);
+
+	bHasInvAmmo = MaxInventoryAmmo > 0;
+	bHasMagAmmo = MagazineAmmo > 0;
+	if (!bHasMagAmmo && bHasInvAmmo) {
+		AutomaticReload();
+	}
 }
 
 

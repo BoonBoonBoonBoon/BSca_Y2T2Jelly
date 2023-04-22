@@ -30,7 +30,7 @@ APickUpBase::APickUpBase()
 	
 	// Checks Rotation 
 	bRotate = true;
-	RotationRate = 90;
+	RotationRate = 70;
 
 }
 

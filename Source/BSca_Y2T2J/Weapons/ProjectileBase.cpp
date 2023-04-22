@@ -35,10 +35,6 @@ void AProjectileBase::BeginPlay()
 	// Reduces Size 
 	CollisionBody->InitSphereRadius(20.f);
 
-
-	
-
-
 }
 
 // Called every frame
@@ -51,38 +47,10 @@ void AProjectileBase::Tick(float DeltaTime)
 
 }
 
-// Doesnt Work 
-	/*
-	ProjTakeDamage = Cast<UHealthComponent>(OtherActor);
-	UHealthComponent::TakeDamage;
-
-	GetFirstPlayerController()->GetCharacter());
-
-	UWorld* WorldRef = GetWorld();
-	UHealthComponent* HealthRef = Cast<UHealthComponent>(WorldRef->GetFirstPlayerController()->GetCharacter());
-	if(HealthRef)
-	{
-
-
-		HealthRef->TakeDamage();
-
-	}
-	*/
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*
-	 UHealthComponent* HealthComp = Cast<UHealthComponent>(OtherActor);
-	if (Cast<UHealthComponent>(OtherActor)) {
-		UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
-
-		OnTakeDamage(20.f, FDamageEvent::FDamageEvent(), NULL, NULL);
-
-	}
-	*/
-	//Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth)
-	//Owner = Cast<UHealthComponent>(&TakeDamagePtr)
-	//HealthComp2->OnTakeDamage(OtherActor, 20, nullptr, nullptr, nullptr);
+	
 
 	UE_LOG(LogTemp, Warning, TEXT("Damage"));
 	Destroy();
