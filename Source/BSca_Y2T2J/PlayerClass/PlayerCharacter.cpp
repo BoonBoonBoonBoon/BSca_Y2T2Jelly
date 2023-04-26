@@ -124,7 +124,7 @@ APlayerCharacter::APlayerCharacter()
 	ZoomCrouchSpeed = 180.f;
 
 	/* Reserve 3 spaces before array has to resize */
-	CheckWeaponMeshIndex.Reserve(2);
+	//CheckWeaponMeshIndex.Reserve(2);
 	
 	
 
@@ -394,7 +394,7 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 void APlayerCharacter::SwitchWeapon()
 {
 	APlayerCharacter* PlayerRef = this;
-
+	/*
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0) {
 
@@ -419,6 +419,7 @@ void APlayerCharacter::SwitchWeapon()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
 	}
+	*/
 }
 
 /* Subtracts Ammo*/

@@ -28,12 +28,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	/**
-	* Health presents the infomation on the UI
-
-	*/
-
 	
 	UPROPERTY(EditAnywhere, blueprintReadWrite, Category = "Health")
 		float DefaultHealth = 100;
@@ -43,7 +37,7 @@ public:
 	UFUNCTION() // ... Dynamic binding
 		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	void IncreaseHealthWidget();
-	float Regen;
+	//void IncreaseHealthWidget();
+	//float Regen;
 	
 };

@@ -25,14 +25,7 @@ void APickupHealth::BeginPlay()
 
 void APickupHealth::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*
-	if (PlayerChar && PlayerChar == OtherActor)
-	{
 	
-		PlayerChar->IncreaseHealth_Implementation();
-	
-	}
-	*/
 
 
 	UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));

@@ -89,12 +89,4 @@ void UHealthComponent::OnTakeDamage(AActor* DamagedActor, float Damage, const cl
 
 }
 
-//Regen = 20.f;
 
-	//Health = FMath::Clamp(Health + Regen, 0.0f, DefaultHealth);
-
-//void UHealthComponent::IncreaseHealthWidget()
-//
-	
-
-//}
