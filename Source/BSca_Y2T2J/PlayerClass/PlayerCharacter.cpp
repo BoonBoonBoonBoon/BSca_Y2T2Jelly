@@ -38,8 +38,13 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 
-	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	
 	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(TEXT("StaminaComp"));
+
+	while (!HealthComp) {
+		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	}
+
 
 	/** Attached Subobjects */
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -484,6 +489,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FTransform SpawnTransform;
+	HealthComp = Cast<UHealthComponent>(AddComponentByClass(UHealthComponent::StaticClass(), false, SpawnTransform, false));
+
+
 	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)

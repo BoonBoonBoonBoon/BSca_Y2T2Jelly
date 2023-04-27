@@ -3,15 +3,13 @@
 
 #include "Pickups/PickupHealth.h"
 #include "Pickups/PickUpBase.h"
-#include "Health/HealthComponent.h"
-//Used to access character
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 void APickupHealth::BeginPlay()
 {
 	Super::BeginPlay();
-
 	/**
 	* Casting here gives the pickup class access to everything inside the player class.
 	* a common communication method where you take a 
@@ -19,18 +17,32 @@ void APickupHealth::BeginPlay()
 	* a different class
 	*/
 	PlayerChar = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+}
 
-		//HealthComp;
+void APickupHealth::CheckHealth(UHealthComponent* HealthComp)
+{
+	float RandomHealth = UKismetMathLibrary::RandomFloatInRange(10, 20);
+	UE_LOG(LogTemp, Warning, TEXT("CheckHealthFunc: %f"), RandomHealth);
+	HealthComp->AddHealth(RandomHealth);
 }
 
 void APickupHealth::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
+	if (OtherActor == PlayerChar) {
 
 
-	UE_LOG(LogTemp, Warning, TEXT("Health Pickup"));
-	Destroy();
-	
+		UE_LOG(LogTemp, Warning, TEXT("Health %s"), *PlayerChar->HealthComp->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Default Health %f"), PlayerChar->HealthComp->DefaultHealth);
+		
+
+		if (PlayerChar->HealthComp->Health < PlayerChar->HealthComp->DefaultHealth) {
+			CheckHealth(PlayerChar->HealthComp);
+			Destroy();
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Cannot pickup"));
+		}
+	}
 }
 
 void APickupHealth::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
