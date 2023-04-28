@@ -18,6 +18,7 @@
 #include "Weapons/ProjectileBase.h"
 #include "Pickups\PickUpAmmo.h"
 #include "Weapons\BaseWeaponControl.h"
+#include "Components/ArrowComponent.h"
 
 // Defines an Alias. Macro for reusablity.
 
@@ -40,7 +41,7 @@ APlayerCharacter::APlayerCharacter()
 
 	
 	StaminaComp = CreateDefaultSubobject<UStaminaComponent>(TEXT("StaminaComp"));
-
+	//  new
 	while (!HealthComp) {
 		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 	}
@@ -194,6 +195,8 @@ void APlayerCharacter::MoveHor(float Value)
 	}
 }
 
+
+
 void APlayerCharacter::Run()
 {
 	CheckMovementBooleans(NULL, true, NULL, NULL, bIsZoomedin);
@@ -286,6 +289,7 @@ void APlayerCharacter::OnBasicFire()
 			{
 			bIsFiring = true;
 			UseAmmo();
+			FireSingleProjectile();
 		
 			FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
@@ -302,6 +306,46 @@ void APlayerCharacter::OnBasicFire()
 			UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
 		}
 	}
+}
+
+void APlayerCharacter::FireSingleProjectile()
+{
+
+	if (Projectileclass != nullptr) {
+
+		UWorld* World = GetWorld();
+		if (World != nullptr) {
+			UE_LOG(LogTemp, Error, TEXT("Weapon Fire"));
+			// Gets the actor location on where to spawn projectile
+			FRotator SpawnRot = GetOwner()->GetActorRotation();
+			FVector SpawLoc = GetOwner()->GetActorLocation();
+
+			// Set spawn collision, we override it 
+			FActorSpawnParameters SpawnParam;
+			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+			World->SpawnActor<APlayerCharacter>(Projectileclass, SpawLoc, SpawnRot, SpawnParam);
+
+		}
+
+
+	}
+
+
+
+
+	/*
+	UArrowComponent* Arrow = GetWorld()->SpawnActor<UArrowComponent>();
+	FVector GetPlayerLoc = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector();
+	FVector GetPlayerEndLoc((ForwardVector * 100) + GetPlayerLoc);
+	FRotator GetPlayerRot = GetActorRotation();
+
+	if (Arrow) {
+		DrawDebugDirectionalArrow(GetWorld(), GetPlayerLoc, GetPlayerEndLoc, 10.f, FColor::Red, true, 1.f, 10.f);}
+	*/
+
+
 }
 
 /* Weapon Class Specific Shotgun functionality*/
@@ -489,7 +533,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	// added this new
 	FTransform SpawnTransform;
 	HealthComp = Cast<UHealthComponent>(AddComponentByClass(UHealthComponent::StaticClass(), false, SpawnTransform, false));
 
@@ -510,8 +554,12 @@ void APlayerCharacter::BeginPlay()
 					//// Events
 
 
-void APlayerCharacter::IncreaseHealth_Implementation()
+void APlayerCharacter::IncreaseHealth_Implementation(UHealthComponent* OtherActor)
 {
+	//UHealthComponent* HealComp = Cast<UHealthComponent>(OtherActor);
+	//HealComp->AddHealth(HealComp->Health);
+	
+
 }
 void APlayerCharacter::OnStaminaUse_Implementation()
 {

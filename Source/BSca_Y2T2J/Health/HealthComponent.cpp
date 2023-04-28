@@ -9,6 +9,7 @@
 #include "Pickups\PickupHealth.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
@@ -40,13 +41,28 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	OnTakeDamage(NULL, NULL, NULL, NULL, NULL);
 }
 
 void UHealthComponent::AddHealth(float HealthChange)
 {	
-	Health = UKismetMathLibrary::FClamp(Health - HealthChange, 0.f, DefaultHealth);
-	UE_LOG(LogTemp, Error, TEXT("Health After Being Added: %f"), HealthChange);
+	// takes input of a value from 10 to 20
+	float HealthInc;
+	// should return the value of the health increase
+	HealthInc = UKismetMathLibrary::FClamp(HealthChange, 0.f, DefaultHealth);
+	UE_LOG(LogTemp, Warning, TEXT("Health before Being Added: %f"), Health);
+	UE_LOG(LogTemp, Warning, TEXT("Healthinc value: %f"), HealthInc)
+
+	Health = FMath::Clamp(Health + HealthInc, 0.f, DefaultHealth);
+
 	
+	UHealthComponent* HealthComponent = this;
+	if (HealthComponent) {
+		APlayerCharacter* PlayerPtr = Cast<APlayerCharacter>(HealthComponent);
+		PlayerPtr->IncreaseHealth_Implementation(HealthComponent);
+	}
+	UE_LOG(LogTemp, Error, TEXT("Updated health value: %f"), Health)
+
 }
 
 
@@ -57,6 +73,7 @@ void UHealthComponent::OnTakeDamage(AActor* DamagedActor, float Damage, const cl
 		return;		// ... Checking if take damage. 
 	}
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	UE_LOG(LogTemp, Error, TEXT("Health After Being Damaged: %f"), Health);
 }
 
 

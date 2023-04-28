@@ -32,7 +32,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float Health = 100;
 
+	
+
+	UFUNCTION()
 	void AddHealth(float HealthChange);
+
 
 	UFUNCTION() // ... Dynamic binding
 		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);

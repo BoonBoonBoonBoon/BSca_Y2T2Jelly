@@ -84,6 +84,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int MaxDefaultMagazineAmmo = 30; 
 	
+	void FireSingleProjectile();
+
+	// Class to spawn
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+		TSubclassOf<class AProjectileBase> Projectileclass;
+
 	// Speed at which a weapon can fire.
 	int fireRate;
 
@@ -109,8 +115,8 @@ public:
 
 	// Widget Health Increase.
 	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
-		void IncreaseHealth();
-		void IncreaseHealth_Implementation();
+		void IncreaseHealth(UHealthComponent* OtherActor);
+		void IncreaseHealth_Implementation(UHealthComponent* OtherActor);
 
 	// Widget Stamina Decrease.
 	UFUNCTION(BlueprintNativeEvent, Category = "OnStaminaUse")

@@ -7,6 +7,7 @@
 #include "PlayerClass\PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework\Pawn.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -18,6 +19,11 @@ AProjectileBase::AProjectileBase()
 	RootComponent = CollisionBody;
 
 	HealthComp2 = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp2"));
+
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ProjectileMovement->InitialSpeed = 500.f;
+	ProjectileMovement->MaxSpeed = 2000.f;
+	ProjectileMovement->ProjectileGravityScale = 0.2;
 
 	/** New Component, Attaches it to Root.
 	* Gives this the body.

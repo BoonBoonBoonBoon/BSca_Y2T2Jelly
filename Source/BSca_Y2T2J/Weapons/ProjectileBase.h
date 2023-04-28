@@ -10,15 +10,14 @@ UCLASS()
 class BSCA_Y2T2J_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
-	
 
+	
 public:	
 	// Sets default values for this actor's properties
 	AProjectileBase();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
 		class USkeletalMeshComponent* SkeletalMesh;
-
 
 	// Creates Sphere
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
@@ -28,7 +27,9 @@ public:
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 			class UHealthComponent* HealthComp2;
-	
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+
+			class UProjectileMovementComponent* ProjectileMovement;
 
 protected:
 	// Called when the game starts or when spawned

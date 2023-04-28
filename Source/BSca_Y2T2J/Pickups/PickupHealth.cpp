@@ -21,8 +21,11 @@ void APickupHealth::BeginPlay()
 
 void APickupHealth::CheckHealth(UHealthComponent* HealthComp)
 {
+	// Randomize a float value 
 	float RandomHealth = UKismetMathLibrary::RandomFloatInRange(10, 20);
+
 	UE_LOG(LogTemp, Warning, TEXT("CheckHealthFunc: %f"), RandomHealth);
+	// give arg random value to health to calculate
 	HealthComp->AddHealth(RandomHealth);
 }
 
@@ -31,8 +34,8 @@ void APickupHealth::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 	if (OtherActor == PlayerChar) {
 
 
-		UE_LOG(LogTemp, Warning, TEXT("Health %s"), *PlayerChar->HealthComp->GetName());
-		UE_LOG(LogTemp, Warning, TEXT("Default Health %f"), PlayerChar->HealthComp->DefaultHealth);
+		//UE_LOG(LogTemp, Warning, TEXT("Health %s"), *PlayerChar->HealthComp->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("Default Health %f"), PlayerChar->HealthComp->DefaultHealth);
 		
 
 		if (PlayerChar->HealthComp->Health < PlayerChar->HealthComp->DefaultHealth) {
