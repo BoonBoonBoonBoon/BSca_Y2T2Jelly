@@ -9,6 +9,7 @@
 #include "GameFramework\Pawn.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
+
 // Sets default values
 AProjectileBase::AProjectileBase()
 {
@@ -18,9 +19,18 @@ AProjectileBase::AProjectileBase()
 	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
 	RootComponent = CollisionBody;
 
+	
+
 	HealthComp2 = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp2"));
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	//StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	//StaticMesh->SetupAttachment(GetRootComponent());
+
+//	static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("Blueprint'/Game/Blueprints/Weapons/ProjectileBaseBp.ProjectileBaseBP'"));
+
+	//if (Mesh.Succeeded()) {
+//		StaticMesh->SetStaticMesh(Mesh.Object);
+	//}
+	//StaticMesh->SetupAttachment(CollisionBody);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->InitialSpeed = 3500.f;
@@ -29,8 +39,8 @@ AProjectileBase::AProjectileBase()
 	/** New Component, Attaches it to Root.
 	* Gives this the body.
 	*/
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SkeletalMesh->SetupAttachment(GetRootComponent());
+	//SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	//SkeletalMesh->SetupAttachment(GetRootComponent());
 
 }
 

@@ -16,8 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileBase();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
-		class USkeletalMeshComponent* SkeletalMesh;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
+		//class USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StaticMesh")
 		class UStaticMeshComponent* StaticMesh;

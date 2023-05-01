@@ -316,6 +316,8 @@ void APlayerCharacter::FireSingleProjectile()
 {
 	// checks if we have selected a bullet class 
 	if (Projectileclass) {
+
+
 		// Handle for spawn params.
 		FActorSpawnParameters SpawnParams;
 		// Collison Spawn params, Always spawns bullet no matter what
@@ -328,6 +330,7 @@ void APlayerCharacter::FireSingleProjectile()
 		SpawnParams.Instigator = this;
 
 
+		
 		/* Transform for projectile, Not needed currently  */
 		FTransform ProjectileSpawnTransForm;
 		// Spawn projecitle infront of player
@@ -338,7 +341,7 @@ void APlayerCharacter::FireSingleProjectile()
 		// set scale to make sure it doesnt warp
 		ProjectileSpawnTransForm.SetScale3D(FVector(1.f));
 		//GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, ProjectileSpawnTransForm, SpawnParams);
-
+		
 
 		// Spawn Projectile from character view.
 		FVector CamLoc = CameraComp->GetForwardVector();
