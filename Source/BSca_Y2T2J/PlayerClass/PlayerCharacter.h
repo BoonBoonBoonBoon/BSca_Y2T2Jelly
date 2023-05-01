@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapons/ProjectileBase.h"
+#include "Health\HealthComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
+
 
 UCLASS()
 class BSCA_Y2T2J_API APlayerCharacter : public ACharacter
@@ -13,57 +17,179 @@ class BSCA_Y2T2J_API APlayerCharacter : public ACharacter
 
 		class UCharacterMovementComponent;
 
+
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
-	
-	/** Movement Speed Variables **/
-
-	// ... RunSpeed (TEMP) to hold temparate speed infomation. 
-	float RunSpeedTemp;
-	// ... WalkSpeed Avg (TEMP).
-	float WalkSpeedAvg;
-	// ... For the Max character speed.
-	float RunSpeed; 
-	// ... Character X Axis Turn Speed
-	float TurnSpeed;
-	
-	/** Boolean Checks **/
-
-	// ... Checks if Running.
-	bool bIsRunning;
-	// ... Checks if jumping.
-	bool bIsJumping;
-
-
-	/** Pickup Variables **/
-
-	// ... For Characters Max speed with consumables. 
-	float RunSpeedPickup;
-
-	
-	// ... Max Avg JumpHeight.
-	float JumpHeight; 
-
-	// ... CrouchSpeed.
-	float CrouchSpeed;
-
 
 
 	// Creates StaticMeshComp.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MeshComp")
-		class UStaticMeshComponent* StaticMeshComp; 
+		class UStaticMeshComponent* StaticMeshComp;
 
 	// Creates SpringArm (Used to attach to body/Cam)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SpringArmComp")
-		class USpringArmComponent* SpringArmComp; 
+		class USpringArmComponent* SpringArmComp;
 
 	// Creates Cam (Used for viewport distance)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CameraProp")
-		class UCameraComponent* CameraComp; 
+		class UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class UStaminaComponent* StaminaComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class UHealthComponent* HealthComp;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float WalkSpeedAvg;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float RunSpeed;
+	UPROPERTY(BlueprintReadWrite, Category = "CameraSpin")
+		bool bShouldRotate;
+		float RotationRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float JumpHeight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		float CrouchSpeed;
+
+
+	
+	// Check to see current movement.
+	bool bIsRunning;
+	bool bIsJumping;
+	bool bIsWalking;
+	float TurnSpeed;
+
+	// Movement Speed values, changes speed value.
+	float RunSpeedPickup;
+	float JumpHeightPickup; 
+	float RunSpeedTemp;
+
+	// Max amount of useable ammo, can be manipulated
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxInventoryAmmo; 
+	// Max Set ammo, Cannot be manipulated.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxAmmo = 90; 
+
+	// Useable ammo in the magazine.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MagazineAmmo; 
+	// Max Ammo in a magazine, 30.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxDefaultMagazineAmmo = 30; 
+
+	
+	void FireSingleProjectile();
+
+	// Spawn Projectile.
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+		AProjectileBase* ProjectilePtr;
+
+
+	// Class to spawn
+	UPROPERTY(EditAnywhere, Category = "Shooting")
+		TSubclassOf<class AProjectileBase> Projectileclass;
 
 
 
+	// Speed at which a weapon can fire.
+	int fireRate;
+
+	// Rifle Variables. 
+	int RifleAmmoUse;
+	int RifleAmmoDamage;
+
+	// Check Current Ammo.
+	bool bHasMagAmmo;
+	bool bHasInvAmmo;
+	//bool bHasAmmo; 
+
+
+	// Check Status of Weapon.
+	bool bIsReloading;
+	bool bIsRifle;
+	bool bIsShotgun;
+	
+	UFUNCTION(BlueprintCallable)
+		virtual void Run();
+		void RunEnd();
+
+
+	// Widget Health Increase.
+	UFUNCTION(BlueprintNativeEvent, Category = "HealthIncrease")
+		void IncreaseHealth(UHealthComponent* OtherActor);
+		void IncreaseHealth_Implementation(UHealthComponent* OtherActor);
+
+	// Widget Stamina Decrease.
+	UFUNCTION(BlueprintNativeEvent, Category = "OnStaminaUse")
+		void OnStaminaUse();
+		void OnStaminaUse_Implementation();
+
+	// Camera Spin.
+	UFUNCTION(BlueprintNativeEvent, Category = "CameraSpin")
+		void CameraSpin();
+		void CameraSpin_Implementation();
+
+		UFUNCTION() // ... Dynamic binding
+			void CheckMovementBooleans(bool CheckWalk, bool CheckRun, bool CheckCrouch, bool CheckFire, bool CheckZoom);
+
+		UFUNCTION()
+			void OnBasicFire(); // changed name from onriflefire, will be used as boilerplate as the rifle.
+			void OnShotGunFire(); // shotgun params
+
+		void CheckAmmoPickup(int Ammo);
+		// Depletion of Ammo stock.
+		void UseAmmo();
+
+		// Reload Magazine (R).
+		void ManualReload();
+		// Reload Magazine (AU)
+		//void AutomaticReload();
+
+	
+
+
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
+		class ABaseWeaponControl* EquippedWeapon;
+
+		// Inline to return a Getter
+		FORCEINLINE ABaseWeaponControl* GetEquippedWeapon() { return EquippedWeapon; }
+		FORCEINLINE void SetEquippedWeapon(ABaseWeaponControl* WeaponRefrence) { EquippedWeapon = WeaponRefrence; }
+
+		// Getter for Automatic Reload.
+		FORCEINLINE void AutomaticReload() { ManualReload(); }
+
+		/*Store in the array the pointers to the weapons we spawn with the name checkweapon*/
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapons)
+		TArray<ABaseWeaponControl*> CheckWeaponMeshIndex;
+
+		// The Index of the weapon the player is currently using
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapons)
+			int WeaponIndex;
+
+		// Switch Input (F).
+		void SwitchWeapon();
+
+		// Switches the weapon the character was using to the new weapon they are using
+		UFUNCTION(BlueprintImplementableEvent, Category = "Hud")
+			void SwitchWeaponMesh(int _index);
+
+		// Focus Functions.
+		void ZoomIn();
+		void ZoomOut();
+
+		// Check State of focus.
+		bool bIsZoomedin;
+
+		// Focus Speed Values.
+		int ZoomWalkSpeed;
+		int ZoomRunSpeed;
+		int ZoomCrouchSpeed;
+
+		
 
 
 private:
@@ -71,11 +197,12 @@ private:
 	void MoveVer(float Value);
 	void MoveHor(float Value);
 
+
+
+	UFUNCTION(BlueprintCallable)
 	void StartJump();
 	void JumpEnd();
 
-	void Run();
-	void RunEnd();
 
 	void StartCrouch();
 	void EndCrouch();
@@ -87,7 +214,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void CameraClamp();
+	// Camera Time Handle , Max Timer loops. Number of times it will be tracking.
+	int32 CallTracker = 0;
 	
 private:
 
@@ -98,7 +226,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Timer Function
+	void ResetFire();
 
+	// Handles Delay inbetween shots.
+	FTimerHandle FireDelayTimerHandle;
+
+	// Check Firing opportunity. 
+	bool bWantstoFire;
+	bool bIsFiring;
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

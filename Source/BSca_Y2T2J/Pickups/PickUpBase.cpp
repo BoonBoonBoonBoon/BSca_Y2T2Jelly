@@ -3,6 +3,9 @@
 
 #include "Pickups/PickUpBase.h"
 #include "Components/SphereComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Pickups\PickupHealth.h"
+#include "Health\HealthComponent.h"
 
 // Sets default values
 APickUpBase::APickUpBase()
@@ -27,7 +30,7 @@ APickUpBase::APickUpBase()
 	
 	// Checks Rotation 
 	bRotate = true;
-	RotationRate = 90;
+	RotationRate = 70;
 
 }
 
@@ -35,10 +38,6 @@ APickUpBase::APickUpBase()
 void APickUpBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-
-	
-
 
 
 }
@@ -54,10 +53,8 @@ void APickUpBase::Tick(float DeltaTime)
 	* AddDynamic (Delegates) binds a function and an event (overlap event)
 	* Calls for the Function.*/
 
-	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &APickUpBase::OnOverlapBegin);
-	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &APickUpBase::OnOverlapEnd);
 
-	/** 
+	/**
 	* Checks if the Rotate bool is true
 	* Return RootComp location to Rotation var
 	* Get the Y axis of FR roation plus Rotation Rate
@@ -65,30 +62,30 @@ void APickUpBase::Tick(float DeltaTime)
 	* Set Rotation just updates the new location every second
 	*/
 
+	// Delegates Event to Function
+	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &APickUpBase::OnOverlapBegin);
+	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &APickUpBase::OnOverlapEnd);
+
+	// Multiplies the Yaw rotation of item by every tick. 
 	if (bRotate)
 	{
 		FRotator Rotation = GetActorRotation();
 		Rotation.Yaw += RotationRate * DeltaTime;
 		SetActorRotation(Rotation);
-
 	}
-
-
 }
 
 void APickUpBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
+		UE_LOG(LogTemp, Warning, TEXT("Base Pickup"));
+		Destroy();
 	
-
-	UE_LOG(LogTemp, Warning, TEXT("Object Hit"));
 
 }
 
 void APickUpBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("Object Pickup"));
 
 }
 

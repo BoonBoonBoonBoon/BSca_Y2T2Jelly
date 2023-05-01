@@ -26,9 +26,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
 	float RotationRate;
 	bool bRotate;
+
 
 public:	
 	// Called every frame
