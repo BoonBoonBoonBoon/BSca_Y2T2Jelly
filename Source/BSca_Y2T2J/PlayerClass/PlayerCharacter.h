@@ -54,9 +54,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float CrouchSpeed;
 
-	// Spawn Projectile.
-	UPROPERTY(EditAnywhere, Category = "TSubClass")
-		TSubclassOf<AProjectileBase> Projectileptr;
 
 	
 	// Check to see current movement.
@@ -83,12 +80,20 @@ public:
 	// Max Ammo in a magazine, 30.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int MaxDefaultMagazineAmmo = 30; 
+
 	
 	void FireSingleProjectile();
 
-	// Class to spawn
+	// Spawn Projectile.
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
+		AProjectileBase* ProjectilePtr;
+
+
+	// Class to spawn
+	UPROPERTY(EditAnywhere, Category = "Shooting")
 		TSubclassOf<class AProjectileBase> Projectileclass;
+
+
 
 	// Speed at which a weapon can fire.
 	int fireRate;
@@ -144,8 +149,7 @@ public:
 		// Reload Magazine (AU)
 		//void AutomaticReload();
 
-		// Switch Input (F).
-		void SwitchWeapon();
+	
 
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
@@ -159,8 +163,19 @@ public:
 		FORCEINLINE void AutomaticReload() { ManualReload(); }
 
 		/*Store in the array the pointers to the weapons we spawn with the name checkweapon*/
-		UPROPERTY()
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapons)
 		TArray<ABaseWeaponControl*> CheckWeaponMeshIndex;
+
+		// The Index of the weapon the player is currently using
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapons)
+			int WeaponIndex;
+
+		// Switch Input (F).
+		void SwitchWeapon();
+
+		// Switches the weapon the character was using to the new weapon they are using
+		UFUNCTION(BlueprintImplementableEvent, Category = "Hud")
+			void SwitchWeaponMesh(int _index);
 
 		// Focus Functions.
 		void ZoomIn();
@@ -200,7 +215,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Camera Time Handle , Max Timer loops. Number of times it will be tracking.
-	int32 CallTracker = 3;
+	int32 CallTracker = 0;
 	
 private:
 

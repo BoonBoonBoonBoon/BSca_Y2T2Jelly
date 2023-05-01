@@ -19,17 +19,26 @@ AProjectileBase::AProjectileBase()
 	RootComponent = CollisionBody;
 
 	HealthComp2 = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp2"));
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	//StaticMesh->SetupAttachment(GetRootComponent());
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 500.f;
-	ProjectileMovement->MaxSpeed = 2000.f;
-	ProjectileMovement->ProjectileGravityScale = 0.2;
+	ProjectileMovement->InitialSpeed = 3500.f;
+	ProjectileMovement->MaxSpeed = 4000.f;
 
 	/** New Component, Attaches it to Root.
 	* Gives this the body.
 	*/
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMesh->SetupAttachment(GetRootComponent());
+
+}
+
+void AProjectileBase::FireInDirection(const FVector& ShootDir)
+{
+	// i dont know
+	//ProjectileMovement->Velocity = ShootDir * ProjectileMovement->InitialSpeed;
+	UE_LOG(LogTemp, Warning, TEXT("Valid Projectile"));
 
 }
 

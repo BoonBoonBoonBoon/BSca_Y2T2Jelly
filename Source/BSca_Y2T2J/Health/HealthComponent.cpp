@@ -54,7 +54,6 @@ void UHealthComponent::AddHealth(float HealthChange)
 	UE_LOG(LogTemp, Warning, TEXT("Healthinc value: %f"), HealthInc)
 
 	Health = FMath::Clamp(Health + HealthInc, 0.f, DefaultHealth);
-
 	
 	UHealthComponent* HealthComponent = this;
 	if (HealthComponent) {

@@ -132,7 +132,8 @@ APlayerCharacter::APlayerCharacter()
 	/* Reserve 3 spaces before array has to resize */
 	//CheckWeaponMeshIndex.Reserve(2);
 	
-	
+	// Starting the weapon on a default value.
+	WeaponIndex = 0;
 
 }
 
@@ -291,66 +292,113 @@ void APlayerCharacter::OnBasicFire()
 			UseAmmo();
 			FireSingleProjectile();
 		
-			FHitResult FHit;
+
+
+			///// Line Trace Params.
+			/* FHitResult FHit;
 			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
 			FVector ForwardVector = CameraComp->GetForwardVector();
 			FVector EndLoc((ForwardVector * 4500.f) + StartLoc);
 			FCollisionQueryParams CollisionParam;
 			bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+			if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
+				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
 
-			if (bHit) {
-				DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
-				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
-			}
+
 		} else {
 			UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
 		}
 	}
 }
 
+
 void APlayerCharacter::FireSingleProjectile()
 {
-
-	if (Projectileclass != nullptr) {
-
-		UWorld* World = GetWorld();
-		if (World != nullptr) {
-			UE_LOG(LogTemp, Error, TEXT("Weapon Fire"));
-			// Gets the actor location on where to spawn projectile
-			FRotator SpawnRot = GetOwner()->GetActorRotation();
-			FVector SpawLoc = GetOwner()->GetActorLocation();
-
-			// Set spawn collision, we override it 
-			FActorSpawnParameters SpawnParam;
-			SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-			World->SpawnActor<APlayerCharacter>(Projectileclass, SpawLoc, SpawnRot, SpawnParam);
-
-		}
+	// checks if we have selected a bullet class 
+	if (Projectileclass) {
+		// Handle for spawn params.
+		FActorSpawnParameters SpawnParams;
+		// Collison Spawn params, Always spawns bullet no matter what
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		// Set no fail so it has to spawn, spawning cannot fail
+		SpawnParams.bNoFail = true;
+		// Setting owner 
+		SpawnParams.Owner = this;
+		// the instigator is the actor that caused the damage, i.e. the person that shot the bullet.
+		SpawnParams.Instigator = this;
 
 
+		/* Transform for projectile, Not needed currently  */
+		FTransform ProjectileSpawnTransForm;
+		// Spawn projecitle infront of player
+		ProjectileSpawnTransForm.SetLocation(GetActorForwardVector() * 00.f + GetActorLocation());
+		// Actor rotation makes bullet face same rotation
+		// Quaternion is another way of representing a rotation
+		ProjectileSpawnTransForm.SetRotation(GetActorRotation().Quaternion());
+		// set scale to make sure it doesnt warp
+		ProjectileSpawnTransForm.SetScale3D(FVector(1.f));
+		//GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, ProjectileSpawnTransForm, SpawnParams);
+
+
+		// Spawn Projectile from character view.
+		FVector CamLoc = CameraComp->GetForwardVector();
+		FRotator CamRot = GetActorRotation();
+		GetActorEyesViewPoint(CamLoc, CamRot);
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot, SpawnParams);
 	}
-
-
-
-
-	/*
-	UArrowComponent* Arrow = GetWorld()->SpawnActor<UArrowComponent>();
-	FVector GetPlayerLoc = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector();
-	FVector GetPlayerEndLoc((ForwardVector * 100) + GetPlayerLoc);
-	FRotator GetPlayerRot = GetActorRotation();
-
-	if (Arrow) {
-		DrawDebugDirectionalArrow(GetWorld(), GetPlayerLoc, GetPlayerEndLoc, 10.f, FColor::Red, true, 1.f, 10.f);}
-	*/
-
-
 }
 
 /* Weapon Class Specific Shotgun functionality*/
 void APlayerCharacter::OnShotGunFire()
 {
+
+	/*
+	*
+	*
+	* Add random offset + every unit the bullet travels
+	* fhit function
+	* Lookup Normalized vectors
+	*
+	* fhitresult - impact normal, turn the impact normal into spread.
+	*
+	FHitResult FHit;
+	FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+	FVector ForwardVector = CameraComp->GetForwardVector();
+	FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+	FCollisionQueryParams CollisionParam;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+
+	// get the distance from the tracestart to the location in the world space.
+	float dist = FHit.Distance;
+	// how many units it should spread.
+	float spread = 5.f;
+	// ?? maybe the offset?
+	float falloff = 100.f;
+
+	// if there is a hit, get world location where moving shape would end up against the impacted object
+	fvector newhit = fhit.location
+		// find the normal of the hit location, so you know what axes to spread across
+	for (int shot = 0; shot < numofbullets; ++shot)
+	{
+		// need to get the xyz because we cant just have it on one world axis
+		float newhitoffsetY = (dist / falloff) * spread;
+		float newhitoffsetZ = (dist / falloff) * spread;
+
+		// RAND range generates a randim number inbetween a range (float InMin, float InMax)
+		newhit.y += fmath::randrange(-newhitoffsety, newhitoffsety)
+		newhit.z += fmath::randrange(-newhitoffsetz, newhitoffsetz)
+
+
+		FHitResult FHit;
+		FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+		// look up use links
+		float direction = FMath::Normalize(newhit - StartLoc);
+		FVector EndLoc(StartLoc + (direction * 2500.f));
+		FCollisionQueryParams CollisionParam;
+		bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+	}
+
+	*/
 	UE_LOG(LogTemp, Error, TEXT("Shotgun Shoots!"));
 }
 
@@ -360,66 +408,27 @@ void APlayerCharacter::ManualReload()
 		// keep in mind bool wantto and canfire
 	if (bHasInvAmmo) {
 			int LeftOvers = 0;
-			UE_LOG(LogTemp, Error, TEXT("Reloading"));
+		//	UE_LOG(LogTemp, Error, TEXT("Reloading"));
 			bIsReloading = true;
-			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false);
-			if (bIsReloading) {
-				// fmath min gets the difference of number say if you have 5 and 10 will return 5.
-				int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
-				MagazineAmmo += ReloadAmount;
-				MaxInventoryAmmo -= ReloadAmount;
 
-				/*
-				* 
-				* 
-				* Add random offset + every unit the bullet travels 
-				* fhit function
-				* Lookup Normalized vectors
-				*
-				* fhitresult - impact normal, turn the impact normal into spread.
-				* 
-				FHitResult FHit;
-				FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-				FVector ForwardVector = CameraComp->GetForwardVector();
-				FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
-				FCollisionQueryParams CollisionParam;
-				bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+			//GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, false);
+			//if (CallTracker == 0) {
 
-				// get the distance from the tracestart to the location in the world space.
-				float dist = FHit.Distance;
-				// how many units it should spread.
-				float spread = 5.f;
-				// ?? maybe the offset?
-				float falloff = 100.f;
+				if (bIsReloading) {
+					// fmath min gets the difference of number say if you have 5 and 10 will return 5.
+					int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
+					MagazineAmmo += ReloadAmount;
+					MaxInventoryAmmo -= ReloadAmount;
 
-				// if there is a hit, get world location where moving shape would end up against the impacted object
-				fvector newhit = fhit.location
-					// find the normal of the hit location, so you know what axes to spread across
-				for (int shot = 0; shot < numofbullets; ++shot)
-				{
-					// need to get the xyz because we cant just have it on one world axis
-					float newhitoffsetY = (dist / falloff) * spread;
-					float newhitoffsetZ = (dist / falloff) * spread;
-
-					// RAND range generates a randim number inbetween a range (float InMin, float InMax)
-					newhit.y += fmath::randrange(-newhitoffsety, newhitoffsety)
-					newhit.z += fmath::randrange(-newhitoffsetz, newhitoffsetz)
-					
-
-					FHitResult FHit;
-					FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-					// look up use links 
-					float direction = FMath::Normalize(newhit - StartLoc);
-					FVector EndLoc(StartLoc + (direction * 2500.f));
-					FCollisionQueryParams CollisionParam;
-					bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
 				}
-
-				*/
-			} else {
-			UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
+			//}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
 			}
-	} else {
+
+	} else
+	{
 		UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
 	}
 }
@@ -429,21 +438,67 @@ void APlayerCharacter::ManualReload()
 /* Calculates if Ammo can be inherited */
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
 {
+	//int AmmoInc;
 	if (!bHasMagAmmo && !bHasInvAmmo) {
-		MagazineAmmo =+ Ammo;
-		UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for mag"), Ammo);
+
+		MagazineAmmo = UKismetMathLibrary::FClamp(MagazineAmmo + Ammo, 0, MaxDefaultMagazineAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Updated Magammo value: %d"), MagazineAmmo);
+
+		//MagazineAmmo =+ Ammo;
+		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for mag"), Ammo);
 	}
 	else {
-		MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
-		UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for inv"), Ammo);
+		MaxInventoryAmmo = UKismetMathLibrary::FClamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Updated invammo value: %d"), MaxInventoryAmmo);
+
+		//MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
+		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for inv"), Ammo);
 	}
 }
 
 /* Changes Weapon Index */
 void APlayerCharacter::SwitchWeapon()
 {
-	APlayerCharacter* PlayerRef = this;
+
+
+	switch (WeaponIndex)
+	{
+	case 0: 
+		if (CheckWeaponMeshIndex.Num() > 1) {
+			WeaponIndex = 1;
+			SwitchWeaponMesh(WeaponIndex);
+			UE_LOG(LogTemp, Warning, TEXT("id is %d"), WeaponIndex);
+		}
+		else {
+			WeaponIndex = 0;
+			SwitchWeaponMesh(WeaponIndex);
+		}
+		break;
+	case 1: 
+		if (CheckWeaponMeshIndex.Num() > 2) {
+			WeaponIndex = 2;
+			SwitchWeaponMesh(WeaponIndex);
+			UE_LOG(LogTemp, Warning, TEXT("id is %d"), WeaponIndex);
+		}
+		else {
+			WeaponIndex = 0;
+			SwitchWeaponMesh(WeaponIndex);
+		}
+		break;
+	default:
+		break;
+
+
+
+
+
+	} 
+
+
+
+
 	/*
+	APlayerCharacter* PlayerRef = this;
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0) {
 
@@ -453,11 +508,9 @@ void APlayerCharacter::SwitchWeapon()
 			// if the number in the array is equal too the socket number 
 			if (CheckWeaponMeshIndex[i] == GetEquippedWeapon()) {
 
-		
 				int CurrentWeaponIndex = i;
 				int NewWeaponIndex = CurrentWeaponIndex++;
 				int PreviousIndex = CurrentWeaponIndex--;
-
 
 				if (NewWeaponIndex >= CheckWeaponMeshIndex.Num()) {
 					NewWeaponIndex = 0;
@@ -489,7 +542,7 @@ void APlayerCharacter::ZoomIn()
 	if (bIsZoomedin) {
 		CameraComp->SetFieldOfView(70);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
-		UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
+		//UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
 	}
 	else if (!bIsZoomedin) 
 	{
@@ -503,7 +556,7 @@ void APlayerCharacter::ZoomOut()
 	if (!bIsZoomedin) {
 		CameraComp->SetFieldOfView(90);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
-		UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
+		//UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
 	}
 	else 
 	{
@@ -570,13 +623,29 @@ void APlayerCharacter::CameraSpin_Implementation()
 
 void APlayerCharacter::ResetFire()
 {
-	if (bIsReloading) {
-		bIsReloading = false;
-		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+	while (bIsReloading)
+	{
+		int ReloadSeconds = 2;
+		CallTracker = ReloadSeconds;
+		CallTracker--;
+		UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
 	}
-	else { 
-		return;
-	}
+	//if (bIsReloading) {
+		//bIsReloading = false;
+
+	//	int ReloadSeconds = 2;
+	//	CallTracker = ReloadSeconds;
+	//	CallTracker--;
+	//	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+
+	//	if (CallTracker == 0) {
+		//	GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+		//	UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
+	//	}
+//	}
+	//else { 
+	//	return;
+	//}
 }
 
 

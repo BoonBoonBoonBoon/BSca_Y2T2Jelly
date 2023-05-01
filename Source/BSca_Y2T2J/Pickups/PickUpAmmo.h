@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerClass\PlayerCharacter.h"
 #include "Pickups/PickUpBase.h"
 #include "PickUpAmmo.generated.h"
 
@@ -23,9 +24,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo Type")
 		bool bIShotgunAmmo;
 
-	int RifleAmmoAmount = 30;
+	int RifleAmmoAmount;
 
-	void SetAmmo();
+	APlayerCharacter* PlayerChar = nullptr;
+
+	void SetAmmo(APlayerCharacter* Actor);
 
 	// @see Override
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

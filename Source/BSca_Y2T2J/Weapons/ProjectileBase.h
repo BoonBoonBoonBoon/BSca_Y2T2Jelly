@@ -19,6 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
 		class USkeletalMeshComponent* SkeletalMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StaticMesh")
+		class UStaticMeshComponent* StaticMesh;
+
 	// Creates Sphere
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
 		class USphereComponent* CollisionBody;
@@ -30,6 +33,8 @@ public:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 
 			class UProjectileMovementComponent* ProjectileMovement;
+
+		void FireInDirection(const FVector& ShootDir);
 
 protected:
 	// Called when the game starts or when spawned

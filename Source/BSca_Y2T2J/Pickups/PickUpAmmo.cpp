@@ -3,11 +3,14 @@
 
 #include "Pickups/PickUpAmmo.h"
 #include "PlayerClass\PlayerCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
-void APickUpAmmo::SetAmmo()
+void APickUpAmmo::SetAmmo(APlayerCharacter* Actor)
 {
-
+	int RandomAmmo = UKismetMathLibrary::RandomIntegerInRange(10, 20);
+	UE_LOG(LogTemp, Warning, TEXT("SetAmmoFunc: %d"), RandomAmmo);
+	Actor->CheckAmmoPickup(RandomAmmo);
 
 }
 
@@ -19,15 +22,17 @@ void APickUpAmmo::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 			
 			if (bIsRifleAmmo) {
 				if (PlayerRefAmmo->MaxInventoryAmmo < 90 && PlayerRefAmmo->MagazineAmmo > 0) {
-					PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
-
+					//PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
+					SetAmmo(PlayerRefAmmo);
 					Destroy();
 				}
 				else if (PlayerRefAmmo->MaxInventoryAmmo >= 90) {
 					UE_LOG(LogTemp, Error, TEXT("Inventory Full!"));
 				}
 				else if (PlayerRefAmmo->MagazineAmmo == 0) {
-					PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
+					//PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
+					SetAmmo(PlayerRefAmmo);
+					Destroy();
 				}
 			}
 			else {
