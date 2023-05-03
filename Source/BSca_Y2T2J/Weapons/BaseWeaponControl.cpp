@@ -86,6 +86,7 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 						/* How we add an element to the array, AddUnique is what tells "this" to be added.
 						* AddUnique is the same as add but it will not allow a replicate in the array and will Return it with a -1.*/
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
+						PlayerRefrence->SwitchWeapon();
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
 				}
@@ -95,6 +96,7 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 						Socket->AttachActor(this, PlayerRefrence->GetMesh());
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 						PlayerRefrence->SetEquippedWeapon(this);
+						PlayerRefrence->SwitchWeapon();
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
 				}

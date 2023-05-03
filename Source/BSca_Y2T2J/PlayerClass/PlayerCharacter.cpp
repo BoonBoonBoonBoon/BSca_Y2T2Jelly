@@ -196,7 +196,19 @@ void APlayerCharacter::MoveHor(float Value)
 	}
 }
 
-
+//void APlayerCharacter::Dashing()
+//{
+//
+//	if (!HasUsedAbility)
+//	{
+//		HasUsedAbility = true;
+//		const FVector ForwardDir = this->GetActorRotation().Vector();
+//		LaunchCharacter(ForwardDir * DashDistance, true, true);
+//		GetWorld()->GetTimerManager().SetTimer(AbilityTimeHandler, this, &AMyCharacter::ResetAbility, AbilityDuration, false);
+//	}
+//
+//
+//}
 
 void APlayerCharacter::Run()
 {
@@ -408,56 +420,55 @@ void APlayerCharacter::OnShotGunFire()
 /* Player Input for Manual Reload */
 void APlayerCharacter::ManualReload()
 {
-		// keep in mind bool wantto and canfire
+	// keep in mind bool want to and canfire
 	if (bHasInvAmmo) {
-			int LeftOvers = 0;
+		int LeftOvers = 0;
+		CallTracker = 3;
+		// Inrate is 1 since we want it count to go down every 1 second
+		GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, true);
 
-			bool bIsDoneReloading = false;
-			// Inrate is 1 since we want it count to go down every 1 second
-			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false);
-			bIsDoneReloading = true;
-			if (CallTracker == 0 && bIsDoneReloading) {
-				if (bIsReloading) {
-					// fmath min gets the difference of number say if you have 5 and 10 will return 5.
-					int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
-					MagazineAmmo += ReloadAmount;
-					MaxInventoryAmmo -= ReloadAmount;
-					bIsReloading = false;
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
-			}
-	} else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
 	}
 }
 
 // Timer Check Reloading and other functions.
 void APlayerCharacter::ResetFire()
 {
-	bIsReloading = true;
+	// If reloadsec is equal or greater than call tracker will decrement
+	CallTracker--;
+	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
 	
-	
+	// Checks when the decrease reaches 0 reset timer 
+	if (CallTracker == 0 )
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+		// fmath min gets the difference of number say if you have 5 and 10 will return 5.
+		int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
+		MagazineAmmo += ReloadAmount;
+		MaxInventoryAmmo -= ReloadAmount;
+		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
+	}
 
-	//if (bIsReloading) {
-		//bIsReloading = false;
 
-	//	int ReloadSeconds = 2;
-	//	CallTracker = ReloadSeconds;
-	//	CallTracker--;
-	//	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+	/*if (bIsReloading) {
+		bIsReloading = false;
 
-	//	if (CallTracker == 0) {
-		//	GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
-		//	UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
-	//	}
-//	}
-	//else { 
-	//	return;
-	//}
+	int ReloadSeconds = 2;
+	CallTracker = ReloadSeconds;
+	CallTracker--;
+	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+
+		if (CallTracker == 0) {
+			GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+			UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
+		}
+	}
+	else { 
+		return;
+	}*/
 }
 
 /* Calculates if Ammo can be inherited */
@@ -512,14 +523,10 @@ void APlayerCharacter::SwitchWeapon()
 		break;
 	default:
 		break;
-	} */
-
+	} 
 	
-	APlayerCharacter* PlayerRef = this;
-	// Check if the amount of elements is greater than zero
-	if (CheckWeaponMeshIndex.Num() > 0) {
-
-			// increase the array by one
+	
+				// increase the array by one
 		for (int i = 0; i < CheckWeaponMeshIndex.Num(); i++) {
 
 			// if the number in the array is equal too the socket number 
@@ -534,6 +541,31 @@ void APlayerCharacter::SwitchWeapon()
 				}
 			}
 		}
+	
+	
+	*/
+
+	
+	APlayerCharacter* PlayerRef = this;
+	// Check if the amount of elements is greater than zero
+	if (CheckWeaponMeshIndex.Num() > 0)
+	{
+		int NewWeaponIndex;
+		int PreviousIndex;
+		if (CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1 == CheckWeaponMeshIndex.Num()) // is the current gun the last in the array?
+		{
+			NewWeaponIndex = 0;
+			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
+			UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), NewWeaponIndex);
+			UE_LOG(LogTemp, Warning, TEXT("IF : Previous Weapon Id %d"), PreviousIndex);
+		}else
+		{
+			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
+			PreviousIndex = NewWeaponIndex - 1;
+			UE_LOG(LogTemp, Warning, TEXT("ELSE : New Weapon Id %d"), NewWeaponIndex);
+			UE_LOG(LogTemp, Warning, TEXT("ELSE : Previous Weapon Id %d"), PreviousIndex);
+		}
+		// do whatever with NewWeaponIndex
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
@@ -595,23 +627,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		AutomaticReload();
 	}
 
-	if (bIsReloading)
-	{
-		// Sets the value of seconds we want
-		int ReloadSeconds = 3;
-		UE_LOG(LogTemp, Warning, TEXT("Reloads Seconds %d"), ReloadSeconds);
-		// Assigns the value 
-		CallTracker = ReloadSeconds;
-		// If reloadsec is equal or greater than call tracker will decrement
-		for (ReloadSeconds = 3; CallTracker >= ReloadSeconds; CallTracker--) {
-			CallTracker--;
-			UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
-			// Checks when the decrease reaches 0 reset timer 
-			if (CallTracker == 0) {
-				GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
-			}
-		}
-	}
+
 
 }
 
