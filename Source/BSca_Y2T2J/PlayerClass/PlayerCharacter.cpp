@@ -411,32 +411,54 @@ void APlayerCharacter::ManualReload()
 		// keep in mind bool wantto and canfire
 	if (bHasInvAmmo) {
 			int LeftOvers = 0;
-		//	UE_LOG(LogTemp, Error, TEXT("Reloading"));
-			bIsReloading = true;
 
-			//GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, false);
-			//if (CallTracker == 0) {
-
+			bool bIsDoneReloading = false;
+			// Inrate is 1 since we want it count to go down every 1 second
+			GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 3, false);
+			bIsDoneReloading = true;
+			if (CallTracker == 0 && bIsDoneReloading) {
 				if (bIsReloading) {
 					// fmath min gets the difference of number say if you have 5 and 10 will return 5.
 					int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
 					MagazineAmmo += ReloadAmount;
 					MaxInventoryAmmo -= ReloadAmount;
-
+					bIsReloading = false;
 				}
-			//}
+			}
 			else
 			{
-				UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
+				UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
 			}
-
 	} else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
+		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
 	}
 }
 
+// Timer Check Reloading and other functions.
+void APlayerCharacter::ResetFire()
+{
+	bIsReloading = true;
+	
+	
 
+	//if (bIsReloading) {
+		//bIsReloading = false;
+
+	//	int ReloadSeconds = 2;
+	//	CallTracker = ReloadSeconds;
+	//	CallTracker--;
+	//	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+
+	//	if (CallTracker == 0) {
+		//	GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+		//	UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
+	//	}
+//	}
+	//else { 
+	//	return;
+	//}
+}
 
 /* Calculates if Ammo can be inherited */
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
@@ -463,7 +485,7 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 void APlayerCharacter::SwitchWeapon()
 {
 
-
+	/*
 	switch (WeaponIndex)
 	{
 	case 0: 
@@ -490,17 +512,9 @@ void APlayerCharacter::SwitchWeapon()
 		break;
 	default:
 		break;
+	} */
 
-
-
-
-
-	} 
-
-
-
-
-	/*
+	
 	APlayerCharacter* PlayerRef = this;
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0) {
@@ -524,7 +538,7 @@ void APlayerCharacter::SwitchWeapon()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
 	}
-	*/
+	
 }
 
 /* Subtracts Ammo*/
@@ -541,11 +555,9 @@ void APlayerCharacter::UseAmmo()
 void APlayerCharacter::ZoomIn()
 {
 	bIsZoomedin = true;
-	//70
 	if (bIsZoomedin) {
 		CameraComp->SetFieldOfView(70);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == true);
-		//UE_LOG(LogTemp, Error, TEXT("Zoomed In"));
 	}
 	else if (!bIsZoomedin) 
 	{
@@ -559,7 +571,7 @@ void APlayerCharacter::ZoomOut()
 	if (!bIsZoomedin) {
 		CameraComp->SetFieldOfView(90);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
-		//UE_LOG(LogTemp, Error, TEXT("Zoomed out"));
+	
 	}
 	else 
 	{
@@ -582,6 +594,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (!bHasMagAmmo && bHasInvAmmo) {
 		AutomaticReload();
 	}
+
+	if (bIsReloading)
+	{
+		// Sets the value of seconds we want
+		int ReloadSeconds = 3;
+		UE_LOG(LogTemp, Warning, TEXT("Reloads Seconds %d"), ReloadSeconds);
+		// Assigns the value 
+		CallTracker = ReloadSeconds;
+		// If reloadsec is equal or greater than call tracker will decrement
+		for (ReloadSeconds = 3; CallTracker >= ReloadSeconds; CallTracker--) {
+			CallTracker--;
+			UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+			// Checks when the decrease reaches 0 reset timer 
+			if (CallTracker == 0) {
+				GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+			}
+		}
+	}
+
 }
 
 
@@ -624,32 +655,7 @@ void APlayerCharacter::CameraSpin_Implementation()
 {
 }
 
-void APlayerCharacter::ResetFire()
-{
-	while (bIsReloading)
-	{
-		int ReloadSeconds = 2;
-		CallTracker = ReloadSeconds;
-		CallTracker--;
-		UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
-	}
-	//if (bIsReloading) {
-		//bIsReloading = false;
 
-	//	int ReloadSeconds = 2;
-	//	CallTracker = ReloadSeconds;
-	//	CallTracker--;
-	//	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
-
-	//	if (CallTracker == 0) {
-		//	GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
-		//	UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
-	//	}
-//	}
-	//else { 
-	//	return;
-	//}
-}
 
 
 // Called to bind functionality to input
