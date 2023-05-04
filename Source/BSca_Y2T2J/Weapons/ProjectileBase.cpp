@@ -7,7 +7,9 @@
 #include "PlayerClass\PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework\Pawn.h"
+#include "Weapons\BaseWeaponControl.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -19,26 +21,43 @@ AProjectileBase::AProjectileBase()
 	RootComponent = CollisionBody;
 
 	HealthComp2 = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp2"));
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	//StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	//StaticMesh->SetupAttachment(GetRootComponent());
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->InitialSpeed = 3500.f;
 	ProjectileMovement->MaxSpeed = 4000.f;
 
-	/** New Component, Attaches it to Root.
-	* Gives this the body.
-	*/
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SkeletalMesh->SetupAttachment(GetRootComponent());
 
 }
 
+// NULL FUNCTION
 void AProjectileBase::FireInDirection(const FVector& ShootDir)
 {
 	// i dont know
 	//ProjectileMovement->Velocity = ShootDir * ProjectileMovement->InitialSpeed;
 	UE_LOG(LogTemp, Warning, TEXT("Valid Projectile"));
+
+}
+
+void AProjectileBase::RifleDamageModi(AActor* AIActor)
+{
+	// if (bIsRifle){
+	//	int RandDamageMod  UKismetMathLibrary::RandomIntergerInRange(15, 30);
+	//	UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
+	// 
+	// 
+	// Dont even need this thinking about it now.
+	//	RifleDamage = UKismetMathLibrary::FClamp(RandDamage, 0.f, 30);
+	//
+
+
+}
+
+void AProjectileBase::ShotgunDamageModi(AActor* AIActor)
+{
+
+
 
 }
 
@@ -65,9 +84,18 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// placeholder logic 
+	//AActor* AiActor = nullptr;
+	//if (OtherActor == AiActor) {
+	// On Standby for Ai
+	// AiActor* AiActor = Cast<AAiActorClass>(OtherActor)
+	//	if (AiActor){
+	//if (WeaponRefrence->bIsRifle == true) {
+	// RifleDamageModi(AiActor);
+	// else if (WeaponRefrence->bIsRifle == true){
+	// Do somethingelse
 	
-
-	UE_LOG(LogTemp, Warning, TEXT("Damage"));
+	
 	Destroy();
 
 }

@@ -16,8 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileBase();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
-		class USkeletalMeshComponent* SkeletalMesh;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
+		//class USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StaticMesh")
 		class UStaticMeshComponent* StaticMesh;
@@ -30,11 +30,27 @@ public:
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 			class UHealthComponent* HealthComp2;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 			class UProjectileMovementComponent* ProjectileMovement;
 
 		void FireInDirection(const FVector& ShootDir);
+
+		void RifleDamageModi(AActor* AIActor);
+
+		void ShotgunDamageModi(AActor* AIActor);
+
+		int RifleDamage;
+		int ShotgunDamage;
+
+		//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerRef")
+		//	APlayerCharacter* PlayerRefrence;
+
+		//// Used to call Weapon Boolean Checks
+		//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponRef")
+		//	ABaseWeaponControl* WeaponRefrence;
+
+
 
 protected:
 	// Called when the game starts or when spawned
