@@ -9,6 +9,7 @@
 #include "GameFramework\Pawn.h"
 #include "Weapons\BaseWeaponControl.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "AI\MobParent.h"
 
 
 // Sets default values
@@ -28,6 +29,7 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovement->InitialSpeed = 3500.f;
 	ProjectileMovement->MaxSpeed = 4000.f;
 
+	MobPtr = Cast<AMobParent>(UGameplayStatics::GetActorOfClass(GetWorld(), 0));
 
 }
 
@@ -94,9 +96,16 @@ void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	// RifleDamageModi(AiActor);
 	// else if (WeaponRefrence->bIsRifle == true){
 	// Do somethingelse
+
+	if (OtherActor) {
+		AMobParent* Mob = Cast<AMobParent>(OtherActor);
+		if (Mob) {
+			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
+			Destroy();
+		}
+	}
 	
 	
-	Destroy();
 
 }
 
