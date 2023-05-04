@@ -129,9 +129,6 @@ APlayerCharacter::APlayerCharacter()
 	ZoomRunSpeed = 600.f;
 	ZoomCrouchSpeed = 180.f;
 
-	/* Reserve 3 spaces before array has to resize */
-	//CheckWeaponMeshIndex.Reserve(2);
-	
 	// Starting the weapon on a default value.
 	WeaponIndex = 0;
 
@@ -177,14 +174,6 @@ void APlayerCharacter::MoveVer(float Value)
 
 void APlayerCharacter::MoveHor(float Value)
 {
-	/**
-	* If Ctrl & Value are not NULL
-	* Var Rotation of Type FRotator Gets Cntrl rotation method.
-	* Var YawRtn type FRotator assigned X & Z Axis = 0.
-	* Y Axis gets rotations YAxis
-	* Var Dir of type FVector assigned @see FRotationMatrix
-	* @FRM constructs matrix represents pure rotation, no translation or scale
-	*/
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		CheckMovementBooleans(true, NULL, NULL, NULL, bIsZoomedin);
@@ -295,40 +284,43 @@ void APlayerCharacter::OnBasicFire()
 	bWantstoFire = true;
 	bIsFiring = false;
 
-	if (bWantstoFire && !bIsFiring ) 
+	if (bWantstoFire && !bIsFiring)
 	{
-
-		 if (bHasMagAmmo) 
+		if (!bIsReloading) {
+			if (bHasMagAmmo)
 			{
-			bIsFiring = true;
-			UseAmmo();
-			FireSingleProjectile();
-		
+				bIsFiring = true;
+				UseAmmo();
+				FireSingleProjectile();
 
 
-			///// Line Trace Params.
-			/* FHitResult FHit;
-			FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-			FVector ForwardVector = CameraComp->GetForwardVector();
-			FVector EndLoc((ForwardVector * 4500.f) + StartLoc);
-			FCollisionQueryParams CollisionParam;
-			bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
-			if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
-				DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
-
-
-		} else {
-			UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
+			}
+			else {
+				UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
+			}
 		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Cannot Shoot, Player Reloading."))
+		}
+
 	}
 }
+	///// Line Trace Params.
+		/* FHitResult FHit;
+		FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+		FVector ForwardVector = CameraComp->GetForwardVector();
+		FVector EndLoc((ForwardVector * 4500.f) + StartLoc);
+		FCollisionQueryParams CollisionParam;
+		bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+		if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
+			DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
+
 
 
 void APlayerCharacter::FireSingleProjectile()
 {
 	// checks if we have selected a bullet class 
 	if (Projectileclass) {
-
 
 		// Handle for spawn params.
 		FActorSpawnParameters SpawnParams;
@@ -420,55 +412,40 @@ void APlayerCharacter::OnShotGunFire()
 /* Player Input for Manual Reload */
 void APlayerCharacter::ManualReload()
 {
-	// keep in mind bool want to and canfire
+	UE_LOG(LogTemp, Warning, TEXT("Somthings wrong"));
 	if (bHasInvAmmo) {
-		int LeftOvers = 0;
-		CallTracker = 3;
+		CallTracker = 2;
+		bIsReloading = true;
+
 		// Inrate is 1 since we want it count to go down every 1 second
 		GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, true);
-
 	}
 }
 
 // Timer Check Reloading and other functions.
 void APlayerCharacter::ResetFire()
 {
-	// If reloadsec is equal or greater than call tracker will decrement
-	CallTracker--;
-	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
-	
-	// Checks when the decrease reaches 0 reset timer 
-	if (CallTracker == 0 )
-	{
-		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
-		// fmath min gets the difference of number say if you have 5 and 10 will return 5.
-		int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
-		MagazineAmmo += ReloadAmount;
-		MaxInventoryAmmo -= ReloadAmount;
-		UE_LOG(LogTemp, Error, TEXT("Reload Ammo) Player does not hold anymore Invetory Ammo! "));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Still Reloading"));
-	}
 
+	if (bIsReloading) {
+		// If reloadsec is equal or greater than call tracker will decrement
+		CallTracker--;
+		UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
 
-	/*if (bIsReloading) {
-		bIsReloading = false;
-
-	int ReloadSeconds = 2;
-	CallTracker = ReloadSeconds;
-	CallTracker--;
-	UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
-
-		if (CallTracker == 0) {
+		// Checks when the decrease reaches 0 reset timer 
+		if (CallTracker == 0)
+		{
 			GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
-			UE_LOG(LogTemp, Warning, TEXT("Clearing timer"));
+			// fmath min gets the difference of number say if you have 5 and 10 will return 5.
+			int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
+			MagazineAmmo += ReloadAmount;
+			MaxInventoryAmmo -= ReloadAmount;
+			bIsReloading = false;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Still Reloading"));
 		}
 	}
-	else { 
-		return;
-	}*/
 }
 
 /* Calculates if Ammo can be inherited */
@@ -494,58 +471,7 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 
 /* Changes Weapon Index */
 void APlayerCharacter::SwitchWeapon()
-{
-
-	/*
-	switch (WeaponIndex)
-	{
-	case 0: 
-		if (CheckWeaponMeshIndex.Num() > 1) {
-			WeaponIndex = 1;
-			SwitchWeaponMesh(WeaponIndex);
-			UE_LOG(LogTemp, Warning, TEXT("id is %d"), WeaponIndex);
-		}
-		else {
-			WeaponIndex = 0;
-			SwitchWeaponMesh(WeaponIndex);
-		}
-		break;
-	case 1: 
-		if (CheckWeaponMeshIndex.Num() > 2) {
-			WeaponIndex = 2;
-			SwitchWeaponMesh(WeaponIndex);
-			UE_LOG(LogTemp, Warning, TEXT("id is %d"), WeaponIndex);
-		}
-		else {
-			WeaponIndex = 0;
-			SwitchWeaponMesh(WeaponIndex);
-		}
-		break;
-	default:
-		break;
-	} 
-	
-	
-				// increase the array by one
-		for (int i = 0; i < CheckWeaponMeshIndex.Num(); i++) {
-
-			// if the number in the array is equal too the socket number 
-			if (CheckWeaponMeshIndex[i] == GetEquippedWeapon()) {
-
-				int CurrentWeaponIndex = i;
-				int NewWeaponIndex = CurrentWeaponIndex++;
-				int PreviousIndex = CurrentWeaponIndex--;
-
-				if (NewWeaponIndex >= CheckWeaponMeshIndex.Num()) {
-					NewWeaponIndex = 0;
-				}
-			}
-		}
-	
-	
-	*/
-
-	
+{	
 	APlayerCharacter* PlayerRef = this;
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0)
@@ -624,13 +550,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 	bHasInvAmmo = MaxInventoryAmmo > 0;
 	bHasMagAmmo = MagazineAmmo > 0;
 	if (!bHasMagAmmo && bHasInvAmmo) {
+		//UE_LOG(LogTemp, Warning, TEXT("Player has no ammo in mag"));
 		AutomaticReload();
 	}
-
-
-
 }
-
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
@@ -639,7 +562,6 @@ void APlayerCharacter::BeginPlay()
 	// added this new
 	FTransform SpawnTransform;
 	HealthComp = Cast<UHealthComponent>(AddComponentByClass(UHealthComponent::StaticClass(), false, SpawnTransform, false));
-
 
 	GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Yellow, TEXT("Ignore Stamina and Health Pickups WIP"));
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -659,10 +581,6 @@ void APlayerCharacter::BeginPlay()
 
 void APlayerCharacter::IncreaseHealth_Implementation(UHealthComponent* OtherActor)
 {
-	//UHealthComponent* HealComp = Cast<UHealthComponent>(OtherActor);
-	//HealComp->AddHealth(HealComp->Health);
-	
-
 }
 void APlayerCharacter::OnStaminaUse_Implementation()
 {
