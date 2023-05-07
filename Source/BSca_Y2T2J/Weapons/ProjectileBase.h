@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "AI/MobParent.h"
 #include "ProjectileBase.generated.h"
+
 
 UCLASS()
 class BSCA_Y2T2J_API AProjectileBase : public AActor
@@ -34,6 +36,12 @@ public:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 			class UProjectileMovementComponent* ProjectileMovement;
 
+
+
+		//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MobPtr")
+		 AMobParent* MobPtr = nullptr;
+
+
 		void FireInDirection(const FVector& ShootDir);
 
 		void RifleDamageModi(AActor* AIActor);
@@ -42,13 +50,6 @@ public:
 
 		int RifleDamage;
 		int ShotgunDamage;
-
-		//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerRef")
-		//	APlayerCharacter* PlayerRefrence;
-
-		//// Used to call Weapon Boolean Checks
-		//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponRef")
-		//	ABaseWeaponControl* WeaponRefrence;
 
 
 
