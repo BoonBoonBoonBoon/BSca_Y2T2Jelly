@@ -16,6 +16,7 @@ AMobParent::AMobParent()
 	MobDefaultHealth = 100.f;
 	MobHealth = MobDefaultHealth;
 
+
 	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
 	
 }
