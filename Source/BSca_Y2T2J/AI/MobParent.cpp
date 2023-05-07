@@ -2,6 +2,8 @@
 
 
 #include "AI/MobParent.h"
+#include "Weapons\ProjectileBase.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -14,6 +16,8 @@ AMobParent::AMobParent()
 	MobDefaultHealth = 100.f;
 	MobHealth = MobDefaultHealth;
 
+	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
+	
 }
 
 void AMobParent::AddHealth(float HealthChange)
@@ -35,12 +39,12 @@ void AMobParent::AddHealth(float HealthChange)
 void AMobParent::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 
-	//if (Damage <= 0)
-	//{
-	//	return;		// ... Checking if take damage. 
-	//}
-	//MobHealth = FMath::Clamp(MobHealth - Damage, 0.0f, MobDefaultHealth);
-	//UE_LOG(LogTemp, Error, TEXT("Mob Health After Being Damaged : % f"), MobHealth);
+	if (Damage <= 0)
+	{
+		return;		// ... Checking if take damage. 
+	}
+	MobHealth = FMath::Clamp(MobHealth - Damage, 0.0f, MobDefaultHealth);
+	UE_LOG(LogTemp, Error, TEXT("Mob Health After Being Damaged : % f"), MobHealth);
 
 }
 
@@ -50,12 +54,9 @@ void AMobParent::BeginPlay()
 	Super::BeginPlay();
 	
 	// Get reference to owning actor,
-	AActor* Owner = GetOwner();
-	if (Owner)
-	{
-		// Valid owner returned, whenever takedamage function called, add dynamic binding. 
-		Owner->OnTakeAnyDamage.AddDynamic(this, &AMobParent::OnTakeDamage);
-	}
+	
+	// Valid owner returned, whenever takedamage function called, add dynamic binding. 
+	//CollisionBody->OnComponentBeginOverlap.AddDynamic(this, &AMobParent::OnTakeDamage);
 
 }
 

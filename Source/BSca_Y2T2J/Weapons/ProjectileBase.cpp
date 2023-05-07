@@ -10,6 +10,7 @@
 #include "Weapons\BaseWeaponControl.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AI\MobParent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -44,6 +45,16 @@ void AProjectileBase::FireInDirection(const FVector& ShootDir)
 
 void AProjectileBase::RifleDamageModi(AActor* AIActor)
 {
+	AMobParent* MobActor = Cast<AMobParent>(AIActor);
+	if (MobActor) {
+
+		int RandDamageMod = UKismetMathLibrary::RandomFloatInRange(15, 30);
+		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
+		MobActor->OnTakeDamage(NULL, RandDamageMod, NULL, NULL, NULL);
+		
+
+
+	}
 	// if (bIsRifle){
 	//	int RandDamageMod  UKismetMathLibrary::RandomIntergerInRange(15, 30);
 	//	UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
@@ -100,6 +111,7 @@ void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	if (OtherActor) {
 		AMobParent* Mob = Cast<AMobParent>(OtherActor);
 		if (Mob) {
+			RifleDamageModi(Mob);
 			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
 			Destroy();
 		}

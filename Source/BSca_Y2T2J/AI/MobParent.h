@@ -21,6 +21,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float MobHealth = 100;
 
+	// Creates Sphere
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CollisionBody")
+		class USphereComponent* CollisionBody;
 
 	UFUNCTION()
 		void AddHealth(float HealthChange);
