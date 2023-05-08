@@ -3,7 +3,9 @@
 
 #include "AI/MobParent.h"
 #include "Weapons\ProjectileBase.h"
+#include "PlayerClass\PlayerCharacter.h"
 #include "Components/SphereComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -13,11 +15,12 @@ AMobParent::AMobParent()
 	PrimaryActorTick.bCanEverTick = true;
 
 
-	MobDefaultHealth = 100.f;
+	MobDefaultHealth = 125.f;
 	MobHealth = MobDefaultHealth;
 
 
 	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
+	//TriggerComp = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger Volume"));
 	
 }
 
@@ -47,6 +50,41 @@ void AMobParent::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageT
 	MobHealth = FMath::Clamp(MobHealth - Damage, 0.0f, MobDefaultHealth);
 	UE_LOG(LogTemp, Error, TEXT("Mob Health After Being Damaged : % f"), MobHealth);
 
+
+	ReceiveAnyDamage(Damage, NULL, NULL, NULL);
+
+	//AMobParent* Mob = this;
+	//if (Mob) {
+		// new code 
+	
+		//APlayerCharacter* PlayerRefrence = Cast<APlayerCharacter>(DamagedActor);
+		//UpdateHealth_Implementation(MobHealth);
+	//}
+}
+
+void AMobParent::DropLoot()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Ai Dropped Loot"));
+
+	FHitResult FHit;
+	FVector AiLoc = GetActorLocation() + FVector(0, 0, 200);
+	FRotator AiRot = GetActorRotation();
+
+	UWorld* World = GetWorld();
+	if (World) {
+		if (PlayerRefrence == NULL) {
+			World->LineTraceSingleByChannel(FHit, AiLoc, AiLoc);
+		}
+		else {
+			PlayerRefrence = NULL;
+		}
+	}
+
+}
+
+
+void AMobParent::UpdateHealth_Implementation(float HealthUpdate )	//, APlayerCharacter* PlayerRef
+{
 }
 
 // Called when the game starts or when spawned
@@ -66,6 +104,12 @@ void AMobParent::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	OnTakeDamage(NULL, NULL, NULL, NULL, NULL);
+
+	if (MobHealth == 0) {
+		Destroy();
+		DropLoot();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -75,4 +119,26 @@ void AMobParent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	
 }
+
+void AMobParent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	/*if (TriggerComp) {
+		UE_LOG(LogTemp, Warning, TEXT("Trigger"));
+		APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(OtherActor);
+		AProjectileBase* ProjectileRef = Cast<AProjectileBase>(OtherActor);
+			if(PlayerRef) {
+				//UpdateTrigger(PlayerRefrence);
+			}
+			else if (ProjectileRef) {
+				return;
+			}
+	}
+	*/
+}
+
+void AMobParent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
+
+
 
