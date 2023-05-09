@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "AI\BpLib_LootDrop.h"
 
 // Sets default values
 AMobParent::AMobParent()
@@ -18,10 +19,10 @@ AMobParent::AMobParent()
 	MobDefaultHealth = 125.f;
 	MobHealth = MobDefaultHealth;
 
-
 	CollisionBody = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBody"));
 	//TriggerComp = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger Volume"));
 	
+	bIsDead = false;
 }
 
 void AMobParent::AddHealth(float HealthChange)
@@ -62,24 +63,6 @@ void AMobParent::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageT
 	//}
 }
 
-void AMobParent::DropLoot()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Ai Dropped Loot"));
-
-	FHitResult FHit;
-	FVector AiLoc = GetActorLocation() + FVector(0, 0, 200);
-	FRotator AiRot = GetActorRotation();
-
-	UWorld* World = GetWorld();
-	if (World) {
-	// spawnactor from health class or spawnactor from ammo class
-	}
-}
-
-
-void AMobParent::UpdateHealth_Implementation(float HealthUpdate )	//, APlayerCharacter* PlayerRef
-{
-}
 
 // Called when the game starts or when spawned
 void AMobParent::BeginPlay()
@@ -99,8 +82,9 @@ void AMobParent::Tick(float DeltaTime)
 	OnTakeDamage(NULL, NULL, NULL, NULL, NULL);
 
 	if (MobHealth == 0) {
+		bIsDead = true;
+		DropLoot(bIsDead);
 		Destroy();
-		DropLoot();
 	}
 }
 

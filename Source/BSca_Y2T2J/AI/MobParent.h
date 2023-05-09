@@ -29,9 +29,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trigger")
 		class USphereComponent* TriggerComp;
 
-	UFUNCTION()
-		void DropLoot();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Drops")
+		void DropLoot(bool ActorDeath);
+	
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IsDead?")
+			bool bIsDead;
 	UFUNCTION()
 		void AddHealth(float HealthChange);
 
