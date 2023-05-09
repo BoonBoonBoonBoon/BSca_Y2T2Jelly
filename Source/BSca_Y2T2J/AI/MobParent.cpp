@@ -72,12 +72,7 @@ void AMobParent::DropLoot()
 
 	UWorld* World = GetWorld();
 	if (World) {
-		if (PlayerRefrence == NULL) {
-			World->LineTraceSingleByChannel(FHit, AiLoc, AiLoc);
-		}
-		else {
-			PlayerRefrence = NULL;
-		}
+	// spawnactor from health class or spawnactor from ammo class
 	}
 
 }
