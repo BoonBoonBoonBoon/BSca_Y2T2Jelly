@@ -131,7 +131,6 @@ APlayerCharacter::APlayerCharacter()
 
 	// Starting the weapon on a default value.
 	WeaponIndex = 0;
-
 }
 
 
@@ -412,7 +411,7 @@ void APlayerCharacter::OnShotGunFire()
 /* Player Input for Manual Reload */
 void APlayerCharacter::ManualReload()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Somthings wrong"));
+	//UE_LOG(LogTemp, Warning, TEXT("Somthings wrong"));
 	if (bHasInvAmmo) {
 		CallTracker = 2;
 		bIsReloading = true;
@@ -529,7 +528,6 @@ void APlayerCharacter::ZoomOut()
 	if (!bIsZoomedin) {
 		CameraComp->SetFieldOfView(90);
 		CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin == false);
-	
 	}
 	else 
 	{

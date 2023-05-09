@@ -32,7 +32,6 @@ public:
 	UFUNCTION()
 		void DropLoot();
 
-
 	UFUNCTION()
 		void AddHealth(float HealthChange);
 

@@ -74,7 +74,6 @@ void AMobParent::DropLoot()
 	if (World) {
 	// spawnactor from health class or spawnactor from ammo class
 	}
-
 }
 
 
@@ -91,7 +90,6 @@ void AMobParent::BeginPlay()
 	
 	// Valid owner returned, whenever takedamage function called, add dynamic binding. 
 	//CollisionBody->OnComponentBeginOverlap.AddDynamic(this, &AMobParent::OnTakeDamage);
-
 }
 
 // Called every frame
@@ -104,7 +102,6 @@ void AMobParent::Tick(float DeltaTime)
 		Destroy();
 		DropLoot();
 	}
-
 }
 
 // Called to bind functionality to input
