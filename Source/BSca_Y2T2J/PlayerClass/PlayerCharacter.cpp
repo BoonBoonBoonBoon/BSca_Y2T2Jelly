@@ -359,6 +359,8 @@ void APlayerCharacter::FireSingleProjectile()
 void APlayerCharacter::OnShotGunFire()
 {
 
+
+
 	/*
 	*
 	*
@@ -472,7 +474,6 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 /* Changes Weapon Index */
 void APlayerCharacter::SwitchWeapon()
 {	
-	APlayerCharacter* PlayerRef = this;
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0)
 	{
