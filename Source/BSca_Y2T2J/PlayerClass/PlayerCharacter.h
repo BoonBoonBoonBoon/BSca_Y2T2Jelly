@@ -110,7 +110,6 @@ public:
 		TSubclassOf<class AProjectileBase> Projectileclass;
 
 
-
 	// Speed at which a weapon can fire.
 	int fireRate;
 

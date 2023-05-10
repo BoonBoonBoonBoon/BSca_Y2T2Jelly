@@ -48,7 +48,7 @@ void AProjectileBase::RifleDamageModi(AActor* AIActor)
 	AMobParent* MobActor = Cast<AMobParent>(AIActor);
 	if (MobActor) {
 
-		int RandDamageMod = UKismetMathLibrary::RandomFloatInRange(15, 30);
+		int RandDamageMod = UKismetMathLibrary::RandomFloatInRange(10, 35);
 		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
 		MobActor->OnTakeDamage(NULL, RandDamageMod, NULL, NULL, NULL);
 		
