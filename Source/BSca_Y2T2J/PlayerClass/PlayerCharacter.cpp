@@ -548,9 +548,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	bHasInvAmmo = MaxInventoryAmmo > 0;
 	bHasMagAmmo = MagazineAmmo > 0;
-	if (!bHasMagAmmo && bHasInvAmmo) {
+	if (!bHasMagAmmo && bHasInvAmmo && !bIsReloading) { // Update - Need to make sure the player isnt already ready
 		//UE_LOG(LogTemp, Warning, TEXT("Player has no ammo in mag"));
-		AutomaticReload();
+		ManualReload();
 	}
 }
 
