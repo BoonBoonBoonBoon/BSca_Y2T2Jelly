@@ -19,6 +19,7 @@
 #include "Pickups\PickUpAmmo.h"
 #include "Weapons\BaseWeaponControl.h"
 #include "Components/ArrowComponent.h"
+#include "AI\BpLib_LootDrop.h"
 
 // Defines an Alias. Macro for reusablity.
 

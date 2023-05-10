@@ -41,9 +41,9 @@ public:
 	UFUNCTION()
 		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "HealthUpdate")
-		void UpdateHealth(float HealthUpdate);
-		void UpdateHealth_Implementation(float HealthUpdate);
+	//UFUNCTION(BlueprintNativeEvent, Category = "HealthUpdate")
+	//	void UpdateHealth(float HealthUpdate);
+	//	void UpdateHealth_Implementation(float HealthUpdate);
 
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
