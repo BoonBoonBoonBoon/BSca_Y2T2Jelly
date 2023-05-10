@@ -32,7 +32,19 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float Health = 100;
 
-	
+	int32 HealthRegenTracker;
+	FTimerHandle HealthRegenHandle;
+
+	bool bInCombat;
+	int32 CombatTracker;
+	float DamageToPlayer;
+	FTimerHandle CombatHandle;
+
+	UFUNCTION()
+		void HealthRegeneration();
+
+	UFUNCTION()
+		void CheckCombat();
 
 	UFUNCTION()
 	void AddHealth(float HealthChange);
