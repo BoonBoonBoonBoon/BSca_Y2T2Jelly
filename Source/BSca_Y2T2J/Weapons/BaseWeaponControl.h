@@ -34,7 +34,7 @@ public:
 	void Equip(class APlayerCharacter* PlayerRefrence);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
-		bool bIsWeapon;
+		bool bIsWeapon = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
 		bool bIsRifle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")

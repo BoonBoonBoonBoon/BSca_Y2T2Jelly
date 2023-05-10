@@ -34,7 +34,6 @@ ABaseWeaponControl::ABaseWeaponControl()
 void ABaseWeaponControl::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -111,10 +110,11 @@ void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	if (OtherActor) {
 		APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(OtherActor);
 		if (PlayerRef) {
+			UE_LOG(LogTemp, Warning, TEXT("Player ref good"));
 			Equip(PlayerRef);
+			CollisionVol->OnComponentBeginOverlap.Clear();
 		}
 	}
-	Destroy();
 }
 
 void ABaseWeaponControl::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
