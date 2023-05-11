@@ -11,7 +11,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AI\MobParent.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "AI\MobBoss.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -51,8 +51,13 @@ void AProjectileBase::RifleDamageModi(AActor* AIActor)
 		int RandDamageMod = UKismetMathLibrary::RandomFloatInRange(10, 35);
 		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
 		MobActor->OnTakeDamage(NULL, RandDamageMod, NULL, NULL, NULL);
-		
+	}
+	else {
+		AMobBoss* BossActor = Cast<AMobBoss>(AIActor);
 
+		int RandBossDamageMod = UKismetMathLibrary::RandomFloatInRange(10, 35);
+		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandBossDamageMod);
+		BossActor->OnTakeDamage(NULL, RandBossDamageMod, NULL, NULL, NULL);
 
 	}
 	// if (bIsRifle){
@@ -97,21 +102,17 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// placeholder logic 
-	//AActor* AiActor = nullptr;
-	//if (OtherActor == AiActor) {
-	// On Standby for Ai
-	// AiActor* AiActor = Cast<AAiActorClass>(OtherActor)
-	//	if (AiActor){
-	//if (WeaponRefrence->bIsRifle == true) {
-	// RifleDamageModi(AiActor);
-	// else if (WeaponRefrence->bIsRifle == true){
-	// Do somethingelse
 
 	if (OtherActor) {
 		AMobParent* Mob = Cast<AMobParent>(OtherActor);
+		AMobBoss* Boss = Cast<AMobBoss>(OtherActor);
 		if (Mob) {
 			RifleDamageModi(Mob);
+			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
+			Destroy();
+		}
+		else if(Boss){
+			RifleDamageModi(Boss);
 			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
 			Destroy();
 		}
