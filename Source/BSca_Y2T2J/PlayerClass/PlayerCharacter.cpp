@@ -359,7 +359,65 @@ void APlayerCharacter::FireSingleProjectile()
 void APlayerCharacter::OnShotGunFire()
 {
 
+	// Handle for spawn params.
+	FActorSpawnParameters SpawnParams;
+	// Collison Spawn params, Always spawns bullet no matter what
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// Set no fail so it has to spawn, spawning cannot fail
+	SpawnParams.bNoFail = true;
+	// Setting owner 
+	SpawnParams.Owner = this;
+	// the instigator is the actor that caused the damage, i.e. the person that shot the bullet.
+	SpawnParams.Instigator = this;
 
+	// Spawn Projectile from character view.
+	FVector CamLoc = CameraComp->GetForwardVector();
+	FRotator CamRot = GetActorRotation();
+	GetActorEyesViewPoint(CamLoc, CamRot);
+	// Top Right
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, 5.f,0.f), SpawnParams);
+	// Top Middle
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(5.f, -3.f, 0.f), SpawnParams);
+	// Top Left
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, -10.f, 0.f), SpawnParams);
+	// Bottom Left
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, -12.f, 0.f), SpawnParams);
+	// Bottom Right
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, 7.f, 0.f), SpawnParams);
+	// Bottom Middle
+
+	// Middle Right
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -1.f, 0.f), SpawnParams);
+	// Middle Top
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(1.f, -3.f, 0.f), SpawnParams);
+	// Middle Left
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -6.f, 0.f), SpawnParams);
+	// Middle Bottom
+	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
+
+
+	/*FHitResult FHit1;
+	FVector StartLoc1 = GetActorLocation() + FVector(40, 10, 10);
+	FVector ForwardVector1 = CameraComp->GetForwardVector() + FVector(0, 0.1f , 0.05f);
+	FVector EndLoc1((ForwardVector1 * 2500.f) + StartLoc1 );
+	FCollisionQueryParams CollisionParam1;
+
+	bool bHit1 = GetWorld()->LineTraceSingleByChannel(FHit1, StartLoc1, EndLoc1, ECC_Visibility, CollisionParam1);
+	if (bHit1) {
+		DrawDebugLine(GetWorld(), StartLoc1, EndLoc1, FColor::Red, false, 2, 0, 3);
+		DrawDebugSphere(GetWorld(), FHit1.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
+	} */
+
+	//FHitResult FHit2;
+	//FVector StartLoc2 = GetActorLocation() + FVector(40, 10, 10);
+	//FVector ForwardVector2 = CameraComp->GetForwardVector();
+	//FVector EndLoc2((ForwardVector2 * 2500.f) + StartLoc2);
+	//FCollisionQueryParams CollisionParam2;
+	/*bool bHit2 = GetWorld()->LineTraceSingleByChannel(FHit2, StartLoc2, EndLoc2, ECC_Visibility, CollisionParam2);
+	if (bHit2) {
+		DrawDebugLine(GetWorld(), StartLoc2, EndLoc2, FColor::Red, false, 2, 0, 3);
+		DrawDebugSphere(GetWorld(), FHit2.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
+	}*/
 
 	/*
 	*
@@ -615,6 +673,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::EndCrouch);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnBasicFire);
+	PlayerInputComponent->BindAction("ShotgunTest", IE_Pressed, this, &APlayerCharacter::OnShotGunFire);
+
 	PlayerInputComponent->BindAction("ManualReload", IE_Pressed, this, &APlayerCharacter::ManualReload);
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &APlayerCharacter::SwitchWeapon);
 
