@@ -22,7 +22,7 @@ void APickupHealth::BeginPlay()
 void APickupHealth::CheckHealth(UHealthComponent* HealthComp)
 {
 	// Randomize a float value 
-	float RandomHealth = UKismetMathLibrary::RandomFloatInRange(10, 20);
+	float RandomHealth = UKismetMathLibrary::RandomFloatInRange(6, 12);
 
 	UE_LOG(LogTemp, Warning, TEXT("CheckHealthFunc: %f"), RandomHealth);
 	// give arg random value to health to calculate
