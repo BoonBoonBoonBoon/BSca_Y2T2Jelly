@@ -117,6 +117,9 @@ void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			Destroy();
 		}
 	}
+	else {
+		Destroy();
+	}
 	
 	
 

@@ -42,7 +42,9 @@ public:
 
 	bool bRotate;
 	int RotationRate;
-	
+
+	bool RiflePickedup;
+	bool ShotGunPickedup;
 	
 	// Muzzle mesh for the weapons. 
 	USceneComponent* Muzzle;
