@@ -41,22 +41,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		class UHealthComponent* HealthComp;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-		float DashDistance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-		float RollDistance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-		bool HasUsedAbility;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-		float AbilityDuration;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-		float AbilityCoolDown;
-*/
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		float WalkSpeedAvg;
@@ -104,6 +88,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
 		AProjectileBase* ProjectilePtr;
 
+	UPROPERTY(EditAnywhere, Category = "WeaponRefrence")
+		class ABaseWeaponControl* WeaponRef;
 
 	// Class to spawn
 	UPROPERTY(EditAnywhere, Category = "Shooting")

@@ -45,6 +45,16 @@ public:
 
 	bool RiflePickedup;
 	bool ShotGunPickedup;
+
+	UPROPERTY(EditAnywhere, Category = "Disable")
+		bool HideRifle;
+	UPROPERTY(EditAnywhere, Category = "Disable")
+		bool HideShotgun;
+
+	void SwitchMesh(int WeaponID);
+
+	UFUNCTION(BlueprintCallable, Category = "Disable")
+		void DisableActor();
 	
 	// Muzzle mesh for the weapons. 
 	USceneComponent* Muzzle;

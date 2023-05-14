@@ -132,6 +132,7 @@ APlayerCharacter::APlayerCharacter()
 
 	// Starting the weapon on a default value.
 	WeaponIndex = 0;
+
 }
 
 
@@ -184,20 +185,6 @@ void APlayerCharacter::MoveHor(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
-
-//void APlayerCharacter::Dashing()
-//{
-//
-//	if (!HasUsedAbility)
-//	{
-//		HasUsedAbility = true;
-//		const FVector ForwardDir = this->GetActorRotation().Vector();
-//		LaunchCharacter(ForwardDir * DashDistance, true, true);
-//		GetWorld()->GetTimerManager().SetTimer(AbilityTimeHandler, this, &AMyCharacter::ResetAbility, AbilityDuration, false);
-//	}
-//
-//
-//}
 
 void APlayerCharacter::Run()
 {
@@ -535,20 +522,29 @@ void APlayerCharacter::SwitchWeapon()
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0)
 	{
+		/*if (WeaponRef->RiflePickedup && WeaponRef->ShotGunPickedup) {
+		}
+		if (WeaponRef->RiflePickedup) {
+		}
+		else if (WeaponRef->ShotGunPickedup) {
+		}*/
+
 		int NewWeaponIndex;
 		int PreviousIndex;
 		if (CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1 == CheckWeaponMeshIndex.Num()) // is the current gun the last in the array?
 		{
 			NewWeaponIndex = 0;
 			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
-			UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), NewWeaponIndex);
-			UE_LOG(LogTemp, Warning, TEXT("IF : Previous Weapon Id %d"), PreviousIndex);
+			WeaponRef->SwitchMesh(NewWeaponIndex);
+			
+			//UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), NewWeaponIndex);
+			//UE_LOG(LogTemp, Warning, TEXT("IF : Previous Weapon Id %d"), PreviousIndex);
 		}else
 		{
 			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
 			PreviousIndex = NewWeaponIndex - 1;
-			UE_LOG(LogTemp, Warning, TEXT("ELSE : New Weapon Id %d"), NewWeaponIndex);
-			UE_LOG(LogTemp, Warning, TEXT("ELSE : Previous Weapon Id %d"), PreviousIndex);
+			//UE_LOG(LogTemp, Warning, TEXT("ELSE : New Weapon Id %d"), NewWeaponIndex);
+			//UE_LOG(LogTemp, Warning, TEXT("ELSE : Previous Weapon Id %d"), PreviousIndex);
 		}
 		// do whatever with NewWeaponIndex
 	}
