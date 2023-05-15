@@ -466,7 +466,7 @@ void APlayerCharacter::SwitchWeapon()
 			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
 
 
-			//CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
+			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
 
 
 			//WeaponRef = CheckWeaponMeshIndex(NewWeaponIndex);
