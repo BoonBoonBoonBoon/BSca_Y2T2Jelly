@@ -457,7 +457,7 @@ void APlayerCharacter::SwitchWeapon()
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0)
 	{
-	
+		//APlayerCharacter* Player;
 		int NewWeaponIndex;
 		int PreviousIndex;
 		if (CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1 == CheckWeaponMeshIndex.Num()) // is the current gun the last in the array?
@@ -465,12 +465,18 @@ void APlayerCharacter::SwitchWeapon()
 			NewWeaponIndex = 0;
 			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
 
-
 			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
 
+			WeaponRef->SwitchMesh(this);
 
-			//WeaponRef = CheckWeaponMeshIndex(NewWeaponIndex);
-			WeaponRef->SwitchMesh();
+		/*	WeaponRef->Equip(this);*/
+
+			/*if (CheckWeaponMeshIndex.Last()) {
+				GetEquippedWeapon();
+			}*/
+		
+
+
 		
 		}else{
 
@@ -478,7 +484,15 @@ void APlayerCharacter::SwitchWeapon()
 			PreviousIndex = NewWeaponIndex - 1;
 
 			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
-			WeaponRef->SwitchMesh();
+
+			WeaponRef->SwitchMesh(this);
+
+			/*WeaponRef->Equip(this);*/
+
+			/*if (CheckWeaponMeshIndex.Last()) {
+
+			}*/
+			
 		}
 	}
 	else {

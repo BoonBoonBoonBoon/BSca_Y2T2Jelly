@@ -92,6 +92,10 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 						// Increase Index by 1
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 
+						if (PlayerRefrence->CheckWeaponMeshIndex.Num() >= 1) {
+							HideShotgun = true;
+							HideRifle = false;
+						}
 
 
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
@@ -107,6 +111,12 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 						PlayerRefrence->SetEquippedWeapon(this);
 
+
+						if (PlayerRefrence->CheckWeaponMeshIndex.Num() >= 1) {
+							HideShotgun = false;
+							HideRifle = true;
+						}
+
 				
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
@@ -117,11 +127,48 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 }
 
 
-void ABaseWeaponControl::SwitchMesh(int WeaponID, AActor* playerref)
+void ABaseWeaponControl::SwitchMesh(APlayerCharacter* playerref)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), WeaponID);
+	if (playerref->CheckWeaponMeshIndex.Num() == 2) {
+		UE_LOG(LogTemp, Warning, TEXT("Weapon Swapped"))
+			if(playerref->CheckWeaponMeshIndex.Last())
+			if (playerref->CheckWeaponMeshIndex.Find(playerref->GetEquippedWeapon()) + 1) {
 
-	//if()
+			}
+	}
+
+	//if (bIsRifle) {
+	//	playerref->SetEquippedWeapon(this);
+	//}
+	//else if (bIsShotGun) {
+	//	playerref->SetEquippedWeapon(this);
+	//	}
+
+
+
+
+
+
+
+	/*
+	if (playerref->CheckWeaponMeshIndex.Last()) {
+		
+		if (bIsShotGun) {
+			HideShotgun = true;
+			HideRifle = false;
+		}
+		else if (bIsRifle){
+			HideShotgun = false;
+			HideRifle = true;
+		}*/
+
+	/*}*/
+
+	//if (playerref->CheckWeaponMeshIndex[0]) {
+	//	SetActorHiddenInGame(false);
+	//	SetActorEnableCollision(true);
+	//	SetActorTickEnabled(true);
+	//};
 
 }
 
