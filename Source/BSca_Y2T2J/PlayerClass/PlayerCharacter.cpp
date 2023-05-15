@@ -21,6 +21,7 @@
 #include "Components/ArrowComponent.h"
 #include "AI\BpLib_LootDrop.h"
 #include "Weapons\BaseWeaponControl.h"
+#include "Containers/Array.h"
 
 // Defines an Alias. Macro for reusablity.
 
@@ -134,6 +135,7 @@ APlayerCharacter::APlayerCharacter()
 	// Starting the weapon on a default value.
 	WeaponIndex = 0;
 
+	//CheckWeaponMeshIndex.Init()
 }
 
 
@@ -303,7 +305,7 @@ void APlayerCharacter::OnBasicFire()
 		if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
 			DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
 
-
+void ShotgunDelay(){}
 
 void APlayerCharacter::FireSingleProjectile()
 {
@@ -346,114 +348,46 @@ void APlayerCharacter::FireSingleProjectile()
 /* Weapon Class Specific Shotgun functionality*/
 void APlayerCharacter::OnShotGunFire()
 {
+	if (Projectileclass) {
+		// Handle for spawn params.
+		FActorSpawnParameters SpawnParams;
+		// Collison Spawn params, Always spawns bullet no matter what
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		// Set no fail so it has to spawn, spawning cannot fail
+		SpawnParams.bNoFail = true;
+		// Setting owner 
+		SpawnParams.Owner = this;
+		// the instigator is the actor that caused the damage, i.e. the person that shot the bullet.
+		SpawnParams.Instigator = this;
 
-	// Handle for spawn params.
-	FActorSpawnParameters SpawnParams;
-	// Collison Spawn params, Always spawns bullet no matter what
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// Set no fail so it has to spawn, spawning cannot fail
-	SpawnParams.bNoFail = true;
-	// Setting owner 
-	SpawnParams.Owner = this;
-	// the instigator is the actor that caused the damage, i.e. the person that shot the bullet.
-	SpawnParams.Instigator = this;
+		// Spawn Projectile from character view.
+		FVector CamLoc = CameraComp->GetForwardVector();
+		FRotator CamRot = GetActorRotation();
+		GetActorEyesViewPoint(CamLoc, CamRot);
+		// Top Right
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, 5.f, 0.f), SpawnParams);
+		// Top Middle
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(5.f, -3.f, 0.f), SpawnParams);
+		// Top Left
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, -10.f, 0.f), SpawnParams);
+		// Bottom Left
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, -12.f, 0.f), SpawnParams);
+		// Bottom Right
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, 7.f, 0.f), SpawnParams);
+		// Bottom Middle
 
-	// Spawn Projectile from character view.
-	FVector CamLoc = CameraComp->GetForwardVector();
-	FRotator CamRot = GetActorRotation();
-	GetActorEyesViewPoint(CamLoc, CamRot);
-	// Top Right
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, 5.f,0.f), SpawnParams);
-	// Top Middle
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(5.f, -3.f, 0.f), SpawnParams);
-	// Top Left
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(3.f, -10.f, 0.f), SpawnParams);
-	// Bottom Left
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, -12.f, 0.f), SpawnParams);
-	// Bottom Right
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, 7.f, 0.f), SpawnParams);
-	// Bottom Middle
-
-	// Middle Right
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -1.f, 0.f), SpawnParams);
-	// Middle Top
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(1.f, -3.f, 0.f), SpawnParams);
-	// Middle Left
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -6.f, 0.f), SpawnParams);
-	// Middle Bottom
-	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
-
-
-	/*FHitResult FHit1;
-	FVector StartLoc1 = GetActorLocation() + FVector(40, 10, 10);
-	FVector ForwardVector1 = CameraComp->GetForwardVector() + FVector(0, 0.1f , 0.05f);
-	FVector EndLoc1((ForwardVector1 * 2500.f) + StartLoc1 );
-	FCollisionQueryParams CollisionParam1;
-
-	bool bHit1 = GetWorld()->LineTraceSingleByChannel(FHit1, StartLoc1, EndLoc1, ECC_Visibility, CollisionParam1);
-	if (bHit1) {
-		DrawDebugLine(GetWorld(), StartLoc1, EndLoc1, FColor::Red, false, 2, 0, 3);
-		DrawDebugSphere(GetWorld(), FHit1.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
-	} */
-
-	//FHitResult FHit2;
-	//FVector StartLoc2 = GetActorLocation() + FVector(40, 10, 10);
-	//FVector ForwardVector2 = CameraComp->GetForwardVector();
-	//FVector EndLoc2((ForwardVector2 * 2500.f) + StartLoc2);
-	//FCollisionQueryParams CollisionParam2;
-	/*bool bHit2 = GetWorld()->LineTraceSingleByChannel(FHit2, StartLoc2, EndLoc2, ECC_Visibility, CollisionParam2);
-	if (bHit2) {
-		DrawDebugLine(GetWorld(), StartLoc2, EndLoc2, FColor::Red, false, 2, 0, 3);
-		DrawDebugSphere(GetWorld(), FHit2.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
-	}*/
-
-	/*
-	*
-	*
-	* Add random offset + every unit the bullet travels
-	* fhit function
-	* Lookup Normalized vectors
-	*
-	* fhitresult - impact normal, turn the impact normal into spread.
-	*
-	FHitResult FHit;
-	FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-	FVector ForwardVector = CameraComp->GetForwardVector();
-	FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
-	FCollisionQueryParams CollisionParam;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
-
-	// get the distance from the tracestart to the location in the world space.
-	float dist = FHit.Distance;
-	// how many units it should spread.
-	float spread = 5.f;
-	// ?? maybe the offset?
-	float falloff = 100.f;
-
-	// if there is a hit, get world location where moving shape would end up against the impacted object
-	fvector newhit = fhit.location
-		// find the normal of the hit location, so you know what axes to spread across
-	for (int shot = 0; shot < numofbullets; ++shot)
-	{
-		// need to get the xyz because we cant just have it on one world axis
-		float newhitoffsetY = (dist / falloff) * spread;
-		float newhitoffsetZ = (dist / falloff) * spread;
-
-		// RAND range generates a randim number inbetween a range (float InMin, float InMax)
-		newhit.y += fmath::randrange(-newhitoffsety, newhitoffsety)
-		newhit.z += fmath::randrange(-newhitoffsetz, newhitoffsetz)
-
-
-		FHitResult FHit;
-		FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-		// look up use links
-		float direction = FMath::Normalize(newhit - StartLoc);
-		FVector EndLoc(StartLoc + (direction * 2500.f));
-		FCollisionQueryParams CollisionParam;
-		bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+		// Middle Right
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -1.f, 0.f), SpawnParams);
+		// Middle Top
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(1.f, -3.f, 0.f), SpawnParams);
+		// Middle Left
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -6.f, 0.f), SpawnParams);
+		// Middle Bottom
+		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
 	}
 
-	*/
+
+
 	UE_LOG(LogTemp, Error, TEXT("Shotgun Shoots!"));
 }
 
@@ -530,19 +464,18 @@ void APlayerCharacter::SwitchWeapon()
 		{
 			NewWeaponIndex = 0;
 			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
-			WeaponRef->SwitchMesh(NewWeaponIndex);
-		/*	if(CheckWeaponMeshIndex.Num() == bIsRifle){
 
-			}*/
+
+			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
+
+
+			//WeaponRef = CheckWeaponMeshIndex(NewWeaponIndex);
+			//WeaponRef->SwitchMesh();
 		
 		}else{
 			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
 			PreviousIndex = NewWeaponIndex - 1;
-
 		}
-
-
-		
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
@@ -674,3 +607,73 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &APlayerCharacter::ZoomOut);
 }
 
+/*FHitResult FHit1;
+FVector StartLoc1 = GetActorLocation() + FVector(40, 10, 10);
+FVector ForwardVector1 = CameraComp->GetForwardVector() + FVector(0, 0.1f , 0.05f);
+FVector EndLoc1((ForwardVector1 * 2500.f) + StartLoc1 );
+FCollisionQueryParams CollisionParam1;
+
+bool bHit1 = GetWorld()->LineTraceSingleByChannel(FHit1, StartLoc1, EndLoc1, ECC_Visibility, CollisionParam1);
+if (bHit1) {
+	DrawDebugLine(GetWorld(), StartLoc1, EndLoc1, FColor::Red, false, 2, 0, 3);
+	DrawDebugSphere(GetWorld(), FHit1.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
+} */
+
+//FHitResult FHit2;
+//FVector StartLoc2 = GetActorLocation() + FVector(40, 10, 10);
+//FVector ForwardVector2 = CameraComp->GetForwardVector();
+//FVector EndLoc2((ForwardVector2 * 2500.f) + StartLoc2);
+//FCollisionQueryParams CollisionParam2;
+/*bool bHit2 = GetWorld()->LineTraceSingleByChannel(FHit2, StartLoc2, EndLoc2, ECC_Visibility, CollisionParam2);
+if (bHit2) {
+	DrawDebugLine(GetWorld(), StartLoc2, EndLoc2, FColor::Red, false, 2, 0, 3);
+	DrawDebugSphere(GetWorld(), FHit2.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);
+}*/
+
+/*
+*
+*
+* Add random offset + every unit the bullet travels
+* fhit function
+* Lookup Normalized vectors
+*
+* fhitresult - impact normal, turn the impact normal into spread.
+*
+FHitResult FHit;
+FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+FVector ForwardVector = CameraComp->GetForwardVector();
+FVector EndLoc((ForwardVector * 2500.f) + StartLoc);
+FCollisionQueryParams CollisionParam;
+bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+
+// get the distance from the tracestart to the location in the world space.
+float dist = FHit.Distance;
+// how many units it should spread.
+float spread = 5.f;
+// ?? maybe the offset?
+float falloff = 100.f;
+
+// if there is a hit, get world location where moving shape would end up against the impacted object
+fvector newhit = fhit.location
+	// find the normal of the hit location, so you know what axes to spread across
+for (int shot = 0; shot < numofbullets; ++shot)
+{
+	// need to get the xyz because we cant just have it on one world axis
+	float newhitoffsetY = (dist / falloff) * spread;
+	float newhitoffsetZ = (dist / falloff) * spread;
+
+	// RAND range generates a randim number inbetween a range (float InMin, float InMax)
+	newhit.y += fmath::randrange(-newhitoffsety, newhitoffsety)
+	newhit.z += fmath::randrange(-newhitoffsetz, newhitoffsetz)
+
+
+	FHitResult FHit;
+	FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
+	// look up use links
+	float direction = FMath::Normalize(newhit - StartLoc);
+	FVector EndLoc(StartLoc + (direction * 2500.f));
+	FCollisionQueryParams CollisionParam;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
+}
+
+*/

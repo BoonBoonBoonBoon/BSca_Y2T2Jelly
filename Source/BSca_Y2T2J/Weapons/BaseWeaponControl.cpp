@@ -87,19 +87,12 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 					if (Socket) {
 						// Check is item is picked up - stops rotation if true.
 						RiflePickedup = true;
-						WeaponSetID = 1;
 						Socket->AttachActor(this, PlayerRefrence->GetMesh());
 						PlayerRefrence->SetEquippedWeapon(this);
 						// Increase Index by 1
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 
-/*
-						if (PlayerRefrence->CheckWeaponMeshIndex.Num() > 1) {
-							PlayerRefrence->SwitchWeapon();
-							HideRifle = false;
-							HideShotgun = true;
-						}
-*/						
+
 
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
@@ -109,19 +102,12 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 					const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("ShotGunHandSocket");
 					if (Socket) {
 						ShotGunPickedup = true;
-						WeaponSetID = 2;
 						Socket->AttachActor(this, PlayerRefrence->GetMesh());
 						// Increase Index by 1
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
 						PlayerRefrence->SetEquippedWeapon(this);
 
-					/*
-						if (PlayerRefrence->CheckWeaponMeshIndex.Num() > 1) {
-							PlayerRefrence->SwitchWeapon();
-							HideRifle = true;
-							HideShotgun = false;
-						}
-*/
+				
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
 				}
@@ -131,10 +117,23 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 }
 
 
-void ABaseWeaponControl::SwitchMesh(int WeaponID)
+void ABaseWeaponControl::SwitchMesh(int WeaponID, AActor* playerref)
 {
 	UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), WeaponID);
 
+
+	/*if (Playerref->CheckWeaponMeshIndex.Num() > 1) {
+		PlayerRefrence->SwitchWeapon();
+		HideRifle = false;
+		HideShotgun = true;
+	}
+
+
+	if (Playerref->CheckWeaponMeshIndex.Num() > 1) {
+		PlayerRefrence->SwitchWeapon();
+		HideRifle = true;
+		HideShotgun = false;
+	}*/
 
 }
 

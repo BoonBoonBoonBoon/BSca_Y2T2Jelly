@@ -54,7 +54,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Disable")
 		bool HideShotgun;
 
-	void SwitchMesh(int WeaponID);
+	void SwitchMesh(int WeaponID, AActor* playerref);
 
 	UFUNCTION(BlueprintCallable, Category = "Disable")
 		void DisableActor();

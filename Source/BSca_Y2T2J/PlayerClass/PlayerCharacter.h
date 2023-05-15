@@ -191,6 +191,8 @@ public:
 		int ZoomRunSpeed;
 		int ZoomCrouchSpeed;
 
+		//void ShotgunDelay();
+		//int ShotgunTracker; 
 		
 
 
@@ -230,6 +232,8 @@ public:
 
 	// Timer Function
 	void ResetFire();
+
+	FTimerHandle ShotgunDelay;
 
 	// Handles Delay inbetween shots.
 	FTimerHandle FireDelayTimerHandle;
