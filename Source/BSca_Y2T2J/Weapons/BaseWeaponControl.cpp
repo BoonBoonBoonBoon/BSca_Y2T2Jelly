@@ -121,19 +121,7 @@ void ABaseWeaponControl::SwitchMesh(int WeaponID, AActor* playerref)
 {
 	UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), WeaponID);
 
-
-	/*if (Playerref->CheckWeaponMeshIndex.Num() > 1) {
-		PlayerRefrence->SwitchWeapon();
-		HideRifle = false;
-		HideShotgun = true;
-	}
-
-
-	if (Playerref->CheckWeaponMeshIndex.Num() > 1) {
-		PlayerRefrence->SwitchWeapon();
-		HideRifle = true;
-		HideShotgun = false;
-	}*/
+	//if()
 
 }
 

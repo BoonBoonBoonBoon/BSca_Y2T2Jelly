@@ -470,11 +470,15 @@ void APlayerCharacter::SwitchWeapon()
 
 
 			//WeaponRef = CheckWeaponMeshIndex(NewWeaponIndex);
-			//WeaponRef->SwitchMesh();
+			WeaponRef->SwitchMesh();
 		
 		}else{
+
 			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
 			PreviousIndex = NewWeaponIndex - 1;
+
+			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
+			WeaponRef->SwitchMesh();
 		}
 	}
 	else {
