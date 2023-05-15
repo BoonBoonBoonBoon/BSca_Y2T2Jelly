@@ -20,6 +20,7 @@
 #include "Weapons\BaseWeaponControl.h"
 #include "Components/ArrowComponent.h"
 #include "AI\BpLib_LootDrop.h"
+#include "Weapons\BaseWeaponControl.h"
 
 // Defines an Alias. Macro for reusablity.
 
@@ -522,13 +523,7 @@ void APlayerCharacter::SwitchWeapon()
 	// Check if the amount of elements is greater than zero
 	if (CheckWeaponMeshIndex.Num() > 0)
 	{
-		/*if (WeaponRef->RiflePickedup && WeaponRef->ShotGunPickedup) {
-		}
-		if (WeaponRef->RiflePickedup) {
-		}
-		else if (WeaponRef->ShotGunPickedup) {
-		}*/
-
+	
 		int NewWeaponIndex;
 		int PreviousIndex;
 		if (CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1 == CheckWeaponMeshIndex.Num()) // is the current gun the last in the array?
@@ -536,17 +531,18 @@ void APlayerCharacter::SwitchWeapon()
 			NewWeaponIndex = 0;
 			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
 			WeaponRef->SwitchMesh(NewWeaponIndex);
-			
-			//UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), NewWeaponIndex);
-			//UE_LOG(LogTemp, Warning, TEXT("IF : Previous Weapon Id %d"), PreviousIndex);
-		}else
-		{
+		/*	if(CheckWeaponMeshIndex.Num() == bIsRifle){
+
+			}*/
+		
+		}else{
 			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
 			PreviousIndex = NewWeaponIndex - 1;
-			//UE_LOG(LogTemp, Warning, TEXT("ELSE : New Weapon Id %d"), NewWeaponIndex);
-			//UE_LOG(LogTemp, Warning, TEXT("ELSE : Previous Weapon Id %d"), PreviousIndex);
+
 		}
-		// do whatever with NewWeaponIndex
+
+
+		
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));

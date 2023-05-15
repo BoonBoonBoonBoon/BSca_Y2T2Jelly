@@ -46,6 +46,9 @@ public:
 	bool RiflePickedup;
 	bool ShotGunPickedup;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
+		float WeaponSetID;
+
 	UPROPERTY(EditAnywhere, Category = "Disable")
 		bool HideRifle;
 	UPROPERTY(EditAnywhere, Category = "Disable")
