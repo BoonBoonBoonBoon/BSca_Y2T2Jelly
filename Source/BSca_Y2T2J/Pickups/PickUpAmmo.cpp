@@ -21,15 +21,15 @@ void APickUpAmmo::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 		if (PlayerRefAmmo) {
 			
 			if (bIsRifleAmmo) {
-				if (PlayerRefAmmo->MaxInventoryAmmo < 90 && PlayerRefAmmo->MagazineAmmo > 0) {
+				if (PlayerRefAmmo->MaxRifleInventoryAmmo < 90 && PlayerRefAmmo->RifleMagazineAmmo > 0) {
 					//PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
 					SetAmmo(PlayerRefAmmo);
 					Destroy();
 				}
-				else if (PlayerRefAmmo->MaxInventoryAmmo >= 90) {
+				else if (PlayerRefAmmo->MaxRifleInventoryAmmo >= 90) {
 					UE_LOG(LogTemp, Error, TEXT("Inventory Full!"));
 				}
-				else if (PlayerRefAmmo->MagazineAmmo == 0) {
+				else if (PlayerRefAmmo->RifleMagazineAmmo == 0) {
 					//PlayerRefAmmo->CheckAmmoPickup(RifleAmmoAmount);
 					SetAmmo(PlayerRefAmmo);
 					Destroy();

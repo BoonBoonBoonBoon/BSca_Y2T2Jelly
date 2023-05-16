@@ -112,13 +112,13 @@ APlayerCharacter::APlayerCharacter()
 
 	// Ammo & Firing.
 	RifleAmmoUse = 1;
-	MaxInventoryAmmo = 90;
+	MaxRifleInventoryAmmo = 90;
 	// Sets the max amount of ammmo in inv
-	MaxAmmo = MaxInventoryAmmo;
+	RifleMaxAmmo = MaxRifleInventoryAmmo;
 
-	MagazineAmmo = 30;
+	RifleMagazineAmmo = 30;
 	// Sets the max Amount of ammo in mag
-	MaxDefaultMagazineAmmo = MagazineAmmo; 
+	MaxDefaultRifleMagazineAmmo = RifleMagazineAmmo;
 
 	//bHasAmmo = false; 
 	bWantstoFire = true; 
@@ -277,7 +277,7 @@ void APlayerCharacter::OnBasicFire()
 	if (bWantstoFire && !bIsFiring)
 	{
 		if (!bIsReloading) {
-			if (bHasMagAmmo)
+			if (bHasRifleMagAmmo)
 			{
 				bIsFiring = true;
 				UseAmmo();
@@ -393,7 +393,7 @@ void APlayerCharacter::OnShotGunFire()
 void APlayerCharacter::ManualReload()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Somthings wrong"));
-	if (bHasInvAmmo) {
+	if (bHasRifleInvAmmo) {
 		CallTracker = 2;
 		bIsReloading = true;
 
@@ -416,9 +416,9 @@ void APlayerCharacter::ResetFire()
 		{
 			GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
 			// fmath min gets the difference of number say if you have 5 and 10 will return 5.
-			int ReloadAmount = FMath::Min(MaxDefaultMagazineAmmo - MagazineAmmo, MaxInventoryAmmo);
-			MagazineAmmo += ReloadAmount;
-			MaxInventoryAmmo -= ReloadAmount;
+			int ReloadAmount = FMath::Min(MaxDefaultRifleMagazineAmmo - RifleMagazineAmmo, MaxRifleInventoryAmmo);
+			RifleMagazineAmmo += ReloadAmount;
+			MaxRifleInventoryAmmo -= ReloadAmount;
 			bIsReloading = false;
 		}
 		else
@@ -432,17 +432,17 @@ void APlayerCharacter::ResetFire()
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
 {
 	//int AmmoInc;
-	if (!bHasMagAmmo && !bHasInvAmmo) {
+	if (!bHasRifleMagAmmo && !bHasRifleInvAmmo) {
 
-		MagazineAmmo = UKismetMathLibrary::FClamp(MagazineAmmo + Ammo, 0, MaxDefaultMagazineAmmo);
-		UE_LOG(LogTemp, Error, TEXT("Updated Magammo value: %d"), MagazineAmmo);
+		RifleMagazineAmmo = UKismetMathLibrary::FClamp(RifleMagazineAmmo + Ammo, 0, MaxDefaultRifleMagazineAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Updated Magammo value: %d"), RifleMagazineAmmo);
 
 		//MagazineAmmo =+ Ammo;
 		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for mag"), Ammo);
 	}
 	else {
-		MaxInventoryAmmo = UKismetMathLibrary::FClamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
-		UE_LOG(LogTemp, Error, TEXT("Updated invammo value: %d"), MaxInventoryAmmo);
+		MaxRifleInventoryAmmo = UKismetMathLibrary::FClamp(MaxRifleInventoryAmmo + Ammo, 0, RifleMaxAmmo);
+		UE_LOG(LogTemp, Error, TEXT("Updated invammo value: %d"), MaxRifleInventoryAmmo);
 
 		//MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
 		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for inv"), Ammo);
@@ -502,8 +502,8 @@ void APlayerCharacter::SwitchWeapon()
 /* Subtracts Ammo*/
 void APlayerCharacter::UseAmmo() 
 {
-	if (bHasMagAmmo) {
-		MagazineAmmo = FMath::Clamp(MagazineAmmo - RifleAmmoUse, 0.0f, MaxDefaultMagazineAmmo);
+	if (bHasRifleMagAmmo) {
+		RifleMagazineAmmo = FMath::Clamp(RifleMagazineAmmo - RifleAmmoUse, 0.0f, MaxDefaultRifleMagazineAmmo);
 		//UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
 	} 
 }
@@ -546,9 +546,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	CheckMovementBooleans(bIsWalking, bIsRunning, bIsCrouched, bIsFiring, bIsZoomedin);
 
-	bHasInvAmmo = MaxInventoryAmmo > 0;
-	bHasMagAmmo = MagazineAmmo > 0;
-	if (!bHasMagAmmo && bHasInvAmmo && !bIsReloading) { // Update - Need to make sure the player isnt already ready
+	bHasRifleInvAmmo = MaxRifleInventoryAmmo > 0;
+	bHasRifleMagAmmo = RifleMagazineAmmo > 0;
+	if (!bHasRifleMagAmmo && bHasRifleInvAmmo && !bIsReloading) { // Update - Need to make sure the player isnt already ready
 		//UE_LOG(LogTemp, Warning, TEXT("Player has no ammo in mag"));
 		ManualReload();
 	}

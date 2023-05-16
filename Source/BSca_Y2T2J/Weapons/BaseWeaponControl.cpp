@@ -50,7 +50,6 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &ABaseWeaponControl::OnOverlapBegin);
 	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &ABaseWeaponControl::OnOverlapEnd);
 
-
 	if (HideShotgun) {
 		DisableActor();
 	}else if (HideRifle) {

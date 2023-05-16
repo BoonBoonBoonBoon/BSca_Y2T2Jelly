@@ -5,7 +5,7 @@
 
 void UBpLib_LootDrop::RandomDropRate(TArray <FLoot_Box> Loot_Classes, TSubclassOf <AActor>& Drop_Item, bool& Drop_Rate_Equal_100)
 {
-    // Declare temporary integer array for storing all "Drop Rates"
+    // temp int array for storing all "Drop Rates"
 
     TArray <int32> DropRateArray;
     int32 EqualTo100 = 0;
@@ -16,6 +16,7 @@ void UBpLib_LootDrop::RandomDropRate(TArray <FLoot_Box> Loot_Classes, TSubclassO
     {
         if (x == 0)
         {
+            // Add new item at end of array, Abs returns absolute value.
             DropRateArray.Add(FMath::Abs(Loot_Classes[x].DropRate));
         }
         else

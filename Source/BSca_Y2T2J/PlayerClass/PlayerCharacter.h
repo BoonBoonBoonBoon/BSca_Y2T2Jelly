@@ -70,17 +70,17 @@ public:
 
 	// Max amount of useable ammo, can be manipulated
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxInventoryAmmo; 
+	int MaxRifleInventoryAmmo; 
 	// Max Set ammo, Cannot be manipulated.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxAmmo = 90; 
+	int RifleMaxAmmo = 90; 
 
 	// Useable ammo in the magazine.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MagazineAmmo; 
+	int RifleMagazineAmmo; 
 	// Max Ammo in a magazine, 30.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxDefaultMagazineAmmo = 30; 
+	int MaxDefaultRifleMagazineAmmo = 30; 
 
 	
 	void FireSingleProjectile();
@@ -105,8 +105,8 @@ public:
 	int RifleAmmoDamage;
 
 	// Check Current Ammo.
-	bool bHasMagAmmo;
-	bool bHasInvAmmo;
+	bool bHasRifleMagAmmo;
+	bool bHasRifleInvAmmo;
 	//bool bHasAmmo; 
 
 
