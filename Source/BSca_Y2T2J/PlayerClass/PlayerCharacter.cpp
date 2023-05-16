@@ -305,7 +305,7 @@ void APlayerCharacter::OnBasicFire()
 		if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
 			DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
 
-void ShotgunDelay(){}
+//void ShotgunDelay(){}
 
 void APlayerCharacter::FireSingleProjectile()
 {
@@ -323,8 +323,6 @@ void APlayerCharacter::FireSingleProjectile()
 		// the instigator is the actor that caused the damage, i.e. the person that shot the bullet.
 		SpawnParams.Instigator = this;
 
-
-		
 		/* Transform for projectile, Not needed currently  */
 		FTransform ProjectileSpawnTransForm;
 		// Spawn projecitle infront of player
