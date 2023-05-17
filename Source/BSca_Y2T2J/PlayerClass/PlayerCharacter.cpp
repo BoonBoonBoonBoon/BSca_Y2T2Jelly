@@ -115,10 +115,15 @@ APlayerCharacter::APlayerCharacter()
 	MaxRifleInventoryAmmo = 90;
 	// Sets the max amount of ammmo in inv
 	RifleMaxAmmo = MaxRifleInventoryAmmo;
-
 	RifleMagazineAmmo = 30;
+
 	// Sets the max Amount of ammo in mag
 	MaxDefaultRifleMagazineAmmo = RifleMagazineAmmo;
+
+	ShotgunAmmoUse = 1;
+	MaxShotgunInventoryAmmo = 28;
+	ShotgunMaxAmmo = MaxShotgunInventoryAmmo;
+	ShotgunMagazineAmmo = 12;
 
 	//bHasAmmo = false; 
 	bWantstoFire = true; 
@@ -136,6 +141,7 @@ APlayerCharacter::APlayerCharacter()
 	WeaponIndex = 0;
 
 	//CheckWeaponMeshIndex.Init()
+
 }
 
 
@@ -363,14 +369,15 @@ void APlayerCharacter::OnShotGunFire()
 		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-4.f, 7.f, 0.f), SpawnParams);
 		// Bottom Middle
 
-		// Middle Right
-		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -1.f, 0.f), SpawnParams);
-		// Middle Top
-		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(1.f, -3.f, 0.f), SpawnParams);
-		// Middle Left
-		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -6.f, 0.f), SpawnParams);
-		// Middle Bottom
-		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
+	//	// Middle Right
+	//	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -1.f, 0.f), SpawnParams);
+	//	// Middle Top
+	//	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(1.f, -3.f, 0.f), SpawnParams);
+	//	// Middle Left
+	//	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(-1.f, -6.f, 0.f), SpawnParams);
+	//	// Middle Bottom
+	//	GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
+	//}
 	}
 }
 
@@ -485,6 +492,15 @@ void APlayerCharacter::SwitchWeapon()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player has fewer than 2 weapons"));
 	}
+
+	if (CheckWeaponMeshIndex[0]->GetName().Contains("Rifle")) {
+		RifleHud();
+	}
+
+	if (CheckWeaponMeshIndex[0]->GetName().Contains("Shotgun")) {
+		ShotgunHud();
+	}
+
 	
 }
 
@@ -550,6 +566,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 		//UE_LOG(LogTemp, Warning, TEXT("Player has no ammo in mag"));
 		ManualReload();
 	}
+	bHasShotgunMagAmmo = MaxShotgunInventoryAmmo > 0;
+	bHasShotgunInvAmmo = ShotgunMagazineAmmo > 0;
+	if (!bHasShotgunMagAmmo && bHasShotgunInvAmmo && !bIsReloading) {
+		ManualShotgunReload();
+	}
+
 }
 
 // Called when the game starts or when spawned

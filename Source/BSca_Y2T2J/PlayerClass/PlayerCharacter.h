@@ -106,7 +106,7 @@ public:
 
 	//shotgun Variables
 	int ShotgunAmmoUse;
-	int RifleAmmoDamage;
+	int ShotgunAmmoDamage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
 	int MaxShotgunInventoryAmmo;
@@ -129,6 +129,11 @@ public:
 	bool bHasRifleInvAmmo;
 	//bool bHasAmmo; 
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void RifleHud();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void ShotgunHud();
 
 	// Check Status of Weapon.
 	bool bIsReloading;
