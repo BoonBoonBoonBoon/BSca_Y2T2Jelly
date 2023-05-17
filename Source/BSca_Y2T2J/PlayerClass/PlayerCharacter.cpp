@@ -277,35 +277,24 @@ void APlayerCharacter::OnBasicFire()
 	if (bWantstoFire && !bIsFiring)
 	{
 		if (!bIsReloading) {
-			if (bHasRifleMagAmmo)
-			{
-				bIsFiring = true;
-				UseAmmo();
-				FireSingleProjectile();
-
-
+			if (CheckWeaponMeshIndex[0]->GetName().Contains("Rifle")) {
+				if (bHasRifleMagAmmo)
+				{
+					bIsFiring = true;
+					UseAmmo();
+					FireSingleProjectile();
+				}
 			}
-			else {
-				UE_LOG(LogTemp, Error, TEXT("Player has no mag ammo or inv ammo"));
+			else if (CheckWeaponMeshIndex[0]->GetName().Contains("Shotgun")) {
+				if (bHasShotgunMagAmmo) {
+					bIsFiring = true;
+					ShotgunUseAmmo();
+					OnShotGunFire();
+				}
 			}
 		}
-		else {
-			UE_LOG(LogTemp, Error, TEXT("Cannot Shoot, Player Reloading."))
-		}
-
 	}
 }
-	///// Line Trace Params.
-		/* FHitResult FHit;
-		FVector StartLoc = GetActorLocation() + FVector(40, 10, 10);
-		FVector ForwardVector = CameraComp->GetForwardVector();
-		FVector EndLoc((ForwardVector * 4500.f) + StartLoc);
-		FCollisionQueryParams CollisionParam;
-		bool bHit = GetWorld()->LineTraceSingleByChannel(FHit, StartLoc, EndLoc, ECC_Visibility, CollisionParam);
-		if (bHit) { DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2, 0, 3);
-			DrawDebugSphere(GetWorld(), FHit.ImpactPoint, 10, 4, FColor::Green, false, 4, 0, 3);} */
-
-//void ShotgunDelay(){}
 
 void APlayerCharacter::FireSingleProjectile()
 {
@@ -383,16 +372,26 @@ void APlayerCharacter::OnShotGunFire()
 		// Middle Bottom
 		GetWorld()->SpawnActor<AProjectileBase>(Projectileclass, CamLoc, CamRot + FRotator(0.f, 6.f, 0.f), SpawnParams);
 	}
+}
 
 
+void APlayerCharacter::ManualShotgunReload() {
 
-	UE_LOG(LogTemp, Error, TEXT("Shotgun Shoots!"));
+
+	if (bHasShotgunInvAmmo) {
+		CallTracker = 3;
+		bIsReloading = true;
+
+		// Inrate is 1 since we want it count to go down every 1 second
+		GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, true);
+	}
+
 }
 
 /* Player Input for Manual Reload */
 void APlayerCharacter::ManualReload()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Somthings wrong"));
+	
 	if (bHasRifleInvAmmo) {
 		CallTracker = 2;
 		bIsReloading = true;
@@ -400,6 +399,7 @@ void APlayerCharacter::ManualReload()
 		// Inrate is 1 since we want it count to go down every 1 second
 		GetWorld()->GetTimerManager().SetTimer(FireDelayTimerHandle, this, &APlayerCharacter::ResetFire, 1, true);
 	}
+
 }
 
 // Timer Check Reloading and other functions.
@@ -428,6 +428,30 @@ void APlayerCharacter::ResetFire()
 	}
 }
 
+void APlayerCharacter::ResetShotgunFire()
+{
+	if (bIsReloading) {
+		// If reloadsec is equal or greater than call tracker will decrement
+		CallTracker--;
+		UE_LOG(LogTemp, Warning, TEXT("Timer Tick %d"), CallTracker);
+
+		// Checks when the decrease reaches 0 reset timer 
+		if (CallTracker == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(FireDelayTimerHandle);
+
+			int ReloadShotAmt = FMath::Min(MaxDefaultShotgunMagazineAmmo - ShotgunMagazineAmmo, MaxShotgunInventoryAmmo);
+			ShotgunMagazineAmmo += ReloadShotAmt;
+			MaxShotgunInventoryAmmo -= ReloadShotAmt;
+			bIsReloading = false;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Still Reloading"));
+		}
+	}
+}
+
 /* Calculates if Ammo can be inherited */
 void APlayerCharacter::CheckAmmoPickup(int Ammo)
 {
@@ -437,15 +461,11 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 		RifleMagazineAmmo = UKismetMathLibrary::FClamp(RifleMagazineAmmo + Ammo, 0, MaxDefaultRifleMagazineAmmo);
 		UE_LOG(LogTemp, Error, TEXT("Updated Magammo value: %d"), RifleMagazineAmmo);
 
-		//MagazineAmmo =+ Ammo;
-		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for mag"), Ammo);
 	}
 	else {
 		MaxRifleInventoryAmmo = UKismetMathLibrary::FClamp(MaxRifleInventoryAmmo + Ammo, 0, RifleMaxAmmo);
 		UE_LOG(LogTemp, Error, TEXT("Updated invammo value: %d"), MaxRifleInventoryAmmo);
 
-		//MaxInventoryAmmo = FMath::Clamp(MaxInventoryAmmo + Ammo, 0, MaxAmmo);
-		//UE_LOG(LogTemp, Error, TEXT("Player Picked up %d bullets for inv"), Ammo);
 	}
 }
 
@@ -475,6 +495,15 @@ void APlayerCharacter::UseAmmo()
 		RifleMagazineAmmo = FMath::Clamp(RifleMagazineAmmo - RifleAmmoUse, 0.0f, MaxDefaultRifleMagazineAmmo);
 		//UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
 	} 
+}
+
+void APlayerCharacter::ShotgunUseAmmo() {
+
+	if (bHasShotgunMagAmmo) {
+		ShotgunMagazineAmmo = FMath::Clamp(ShotgunMagazineAmmo - ShotgunAmmoUse, 0.0f, MaxDefaultShotgunMagazineAmmo);
+		//UE_LOG(LogTemp, Error, TEXT("Ammo Use) Player Magazine Ammo is : %d"), MagazineAmmo)
+	}
+
 }
 
 

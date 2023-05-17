@@ -104,6 +104,26 @@ public:
 	int RifleAmmoUse;
 	int RifleAmmoDamage;
 
+	//shotgun Variables
+	int ShotgunAmmoUse;
+	int RifleAmmoDamage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxShotgunInventoryAmmo;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int ShotgunMaxAmmo = 30;
+
+	// Useable ammo in the magazine.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int ShotgunMagazineAmmo;
+	// Max Ammo in a magazine, 30.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int MaxDefaultShotgunMagazineAmmo = 8;
+
+	bool bHasShotgunMagAmmo;
+	bool bHasShotgunInvAmmo;
+
 	// Check Current Ammo.
 	bool bHasRifleMagAmmo;
 	bool bHasRifleInvAmmo;
@@ -145,11 +165,11 @@ public:
 		void CheckAmmoPickup(int Ammo);
 		// Depletion of Ammo stock.
 		void UseAmmo();
+		void ShotgunUseAmmo();
 
 		// Reload Magazine (R).
 		void ManualReload();
-		// Reload Magazine (AU)
-		//void AutomaticReload();
+		void ManualShotgunReload();
 
 	
 
@@ -232,6 +252,7 @@ public:
 
 	// Timer Function
 	void ResetFire();
+	void ResetShotgunFire();
 
 	FTimerHandle ShotgunDelay;
 

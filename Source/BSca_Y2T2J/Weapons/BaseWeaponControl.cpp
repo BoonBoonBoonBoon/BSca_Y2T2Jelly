@@ -50,11 +50,6 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 	CollisionVol->OnComponentBeginOverlap.AddDynamic(this, &ABaseWeaponControl::OnOverlapBegin);
 	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &ABaseWeaponControl::OnOverlapEnd);
 
-	/*if (HideShotgun) {
-		DisableActor(true);
-	}else if (HideRifle) {
-		DisableActor(true);
-	}*/
 
 	// Multiplies the Yaw rotation of item by every tick. 
 	if (bRotate)
@@ -71,11 +66,7 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 		}
 	}
 
-	//if (playerref->CheckWeaponMeshIndex.Find(playerref->GetEquippedWeapon())) {
-	//	DisableActor(playerref->CheckWeaponMeshIndex[0] != this); // Crashes Engine
-	//	UE_LOG(LogTemp, Warning, TEXT("Disable Weapon"));
-	//}
-
+	
 }
 
 void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
@@ -124,10 +115,6 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 					}
 				}
 			}
-			/*else if (PlayerRefrence->CheckWeaponMeshIndex.Num() == 2){
-				DisableActor(PlayerRefrence->CheckWeaponMeshIndex[0] != this);
-				UE_LOG(LogTemp, Warning, TEXT("Last Weapon disabled"));
-			}*/
 		}
 	}
 }
@@ -139,22 +126,6 @@ void ABaseWeaponControl::SwitchMesh(APlayerCharacter* playerref)
 		UE_LOG(LogTemp, Warning, TEXT("%s: Weapon Swapped to %s"), *GetName(), *playerref->CheckWeaponMeshIndex[0]->GetName());
 		
 		DisableActor(playerref->CheckWeaponMeshIndex[0] != this); // Crashes Engine
-
-
-
-			//if(playerref->CheckWeaponMeshIndex.Last())
-
-			//if (playerref->CheckWeaponMeshIndex.Find(playerref->GetEquippedWeapon())) {
-				//UE_LOG(LogTemp, Warning, TEXT("Disable Weapon"));
-			//}
-			//if (playerref->CheckWeaponMeshIndex.Num() >= 1) {
-		
-			//	if (playerref->CheckWeaponMeshIndex[1] == bIsRifle) {
-
-			//	}
-			//	HideShotgun = true;
-			//	HideRifle = false;
-			//}
 
 	}
 }
