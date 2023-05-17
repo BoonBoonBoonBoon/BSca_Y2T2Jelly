@@ -453,48 +453,17 @@ void APlayerCharacter::CheckAmmoPickup(int Ammo)
 void APlayerCharacter::SwitchWeapon()
 {	
 	// Check if the amount of elements is greater than zero
-	if (CheckWeaponMeshIndex.Num() > 0)
+	if (CheckWeaponMeshIndex.Num() > 1)
 	{
-		//APlayerCharacter* Player;
-		int NewWeaponIndex;
-		int PreviousIndex;
-		if (CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1 == CheckWeaponMeshIndex.Num()) // is the current gun the last in the array?
-		{
-			NewWeaponIndex = 0;
-			PreviousIndex = CheckWeaponMeshIndex.Num() - 1;
+		ABaseWeaponControl* Temp = CheckWeaponMeshIndex[0];
+		CheckWeaponMeshIndex[0] = CheckWeaponMeshIndex[1];
+		CheckWeaponMeshIndex[1] = Temp;
 
-			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
-
-			WeaponRef->SwitchMesh(this);
-
-		/*	WeaponRef->Equip(this);*/
-
-			/*if (CheckWeaponMeshIndex.Last()) {
-				GetEquippedWeapon();
-			}*/
-		
-
-
-		
-		}else{
-
-			NewWeaponIndex = CheckWeaponMeshIndex.Find(GetEquippedWeapon()) + 1;
-			PreviousIndex = NewWeaponIndex - 1;
-
-			CheckWeaponMeshIndex.Swap(NewWeaponIndex, PreviousIndex);
-
-			WeaponRef->SwitchMesh(this);
-
-			/*WeaponRef->Equip(this);*/
-
-			/*if (CheckWeaponMeshIndex.Last()) {
-
-			}*/
-			
-		}
+		CheckWeaponMeshIndex[0]->DisableActor(false);
+		CheckWeaponMeshIndex[1]->DisableActor(true);
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("Player has no weapon"));
+		UE_LOG(LogTemp, Warning, TEXT("Player has fewer than 2 weapons"));
 	}
 	
 }

@@ -33,6 +33,7 @@ public:
 
 	void Equip(class APlayerCharacter* PlayerRefrence);
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
 		bool bIsWeapon = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponProperty")
@@ -57,7 +58,7 @@ public:
 	void SwitchMesh(APlayerCharacter* playerref);
 
 	UFUNCTION(BlueprintCallable, Category = "Disable")
-		void DisableActor();
+		void DisableActor(bool Hide);
 	
 	// Muzzle mesh for the weapons. 
 	USceneComponent* Muzzle;
