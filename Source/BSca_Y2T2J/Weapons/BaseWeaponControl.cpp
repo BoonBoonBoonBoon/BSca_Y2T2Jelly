@@ -23,7 +23,6 @@ ABaseWeaponControl::ABaseWeaponControl()
 
 	bIsWeapon = true;
 
-
 	// Checks Rotation 
 	bRotate = true;
 	RotationRate = 90;
@@ -52,12 +51,6 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 	CollisionVol->OnComponentEndOverlap.AddDynamic(this, &ABaseWeaponControl::OnOverlapEnd);
 
 
-	if (HideShotgun) {
-		DisableActor();
-	}else if (HideRifle) {
-		DisableActor();
-	}
-
 	// Multiplies the Yaw rotation of item by every tick. 
 	if (bRotate)
 	{
@@ -72,6 +65,9 @@ void ABaseWeaponControl::Tick(float DeltaTime)
 			SetActorRotation(Rotation);
 		}
 	}
+
+
+	
 }
 
 void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
@@ -82,47 +78,40 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 
 			if (PlayerRefrence->CheckWeaponMeshIndex.Num() <= 2) {
 
+
+
 				if (bIsRifle) {
-					// currently equipped?
-					const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("RifleHandSocket");
+					const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("RightHandSocket");
+
 					if (Socket) {
+
 						// Check is item is picked up - stops rotation if true.
 						RiflePickedup = true;
 
 						Socket->AttachActor(this, PlayerRefrence->GetMesh());
 						PlayerRefrence->SetEquippedWeapon(this);
-
-						// Increase Index by 1
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
-
-						if (PlayerRefrence->CheckWeaponMeshIndex.Num() > 1) {
-							PlayerRefrence->SwitchWeapon();
-							HideRifle = false;
-							HideShotgun = true;
-						}
-						
 
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
-				} else if (bIsShotGun) {
-					// currently equipped 
+				}
+				else if (bIsShotGun) {
+					const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("RightHandSocket");
 
-					const USkeletalMeshSocket* Socket = PlayerRefrence->GetMesh()->GetSocketByName("ShotGunHandSocket");
 					if (Socket) {
+
 						ShotGunPickedup = true;
 						Socket->AttachActor(this, PlayerRefrence->GetMesh());
 
 						// Increase Index by 1
 						PlayerRefrence->CheckWeaponMeshIndex.AddUnique(this);
-
 						PlayerRefrence->SetEquippedWeapon(this);
 
-						if (PlayerRefrence->CheckWeaponMeshIndex.Num() > 1) {
-							PlayerRefrence->SwitchWeapon();
-							HideRifle = true;
-							HideShotgun = false;
-						}
 
+						/*if (PlayerRefrence->CheckWeaponMeshIndex.Num() >= 1) {
+							HideShotgun = false;
+							HideRifle = true;
+						}*/
 						UE_LOG(LogTemp, Warning, TEXT("Weapon Id : %d"), PlayerRefrence->CheckWeaponMeshIndex.Num());
 					}
 				}
@@ -132,21 +121,24 @@ void ABaseWeaponControl::Equip(APlayerCharacter* PlayerRefrence)
 }
 
 
-void ABaseWeaponControl::SwitchMesh(int WeaponID)
+void ABaseWeaponControl::SwitchMesh(APlayerCharacter* playerref)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IF : New Weapon Id %d"), WeaponID);
+	if (playerref->CheckWeaponMeshIndex.Num() == 2) {
+		UE_LOG(LogTemp, Warning, TEXT("%s: Weapon Swapped to %s"), *GetName(), *playerref->CheckWeaponMeshIndex[0]->GetName());
+		
+		DisableActor(playerref->CheckWeaponMeshIndex[0] != this); // Crashes Engine
 
-
+	}
 }
 
-void ABaseWeaponControl::DisableActor()
+void ABaseWeaponControl::DisableActor(bool Hide)
 {
 
-	SetActorHiddenInGame(true);
+	SetActorHiddenInGame(Hide);
 
-	SetActorEnableCollision(false);
+	SetActorEnableCollision(!Hide);
 
-	SetActorTickEnabled(false);
+	SetActorTickEnabled(!Hide);
 }
 
 void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -157,6 +149,7 @@ void ABaseWeaponControl::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 			UE_LOG(LogTemp, Warning, TEXT("Player ref good"));
 			Equip(PlayerRef);
 			CollisionVol->OnComponentBeginOverlap.Clear();
+			if (PlayerRef->CheckWeaponMeshIndex[0] != this) DisableActor(true);
 		}
 		
 	}

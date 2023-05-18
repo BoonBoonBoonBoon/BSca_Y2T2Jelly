@@ -74,7 +74,21 @@ void AProjectileBase::RifleDamageModi(AActor* AIActor)
 
 void AProjectileBase::ShotgunDamageModi(AActor* AIActor)
 {
+	AMobParent* MobActor = Cast<AMobParent>(AIActor);
+	if (MobActor) {
 
+		int RandDamageMod = UKismetMathLibrary::RandomFloatInRange(5, 15);
+		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandDamageMod);
+		MobActor->OnTakeDamage(NULL, RandDamageMod, NULL, NULL, NULL);
+	}
+	else {
+		AMobBoss* BossActor = Cast<AMobBoss>(AIActor);
+
+		int RandBossDamageMod = UKismetMathLibrary::RandomFloatInRange(5, 15);
+		UE_LOG(LogTemp, Warning, TEXT("RandomRifleDamage : %d"), RandBossDamageMod);
+		BossActor->OnTakeDamage(NULL, RandBossDamageMod, NULL, NULL, NULL);
+
+	}
 
 
 }
@@ -102,19 +116,26 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
 	if (OtherActor) {
 		AMobParent* Mob = Cast<AMobParent>(OtherActor);
 		AMobBoss* Boss = Cast<AMobBoss>(OtherActor);
 		if (Mob) {
+			//if (rifle) {
 			RifleDamageModi(Mob);
 			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
 			Destroy();
+			// else if (shotgun)
+			
+			//}
 		}
-		else if(Boss){
+		else if (Boss) {
+			//if (rifle) {
 			RifleDamageModi(Boss);
 			UE_LOG(LogTemp, Warning, TEXT("AI Hit"));
 			Destroy();
+			// else if (shotgun)
+			
+			//}
 		}
 	}
 	else {

@@ -10,6 +10,7 @@
 #include "PlayerCharacter.generated.h"
 
 
+
 UCLASS()
 class BSCA_Y2T2J_API APlayerCharacter : public ACharacter
 {
@@ -69,17 +70,17 @@ public:
 
 	// Max amount of useable ammo, can be manipulated
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxInventoryAmmo; 
+	int MaxRifleInventoryAmmo; 
 	// Max Set ammo, Cannot be manipulated.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxAmmo = 90; 
+	int RifleMaxAmmo = 90; 
 
 	// Useable ammo in the magazine.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MagazineAmmo; 
+	int RifleMagazineAmmo; 
 	// Max Ammo in a magazine, 30.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
-	int MaxDefaultMagazineAmmo = 30; 
+	int MaxDefaultRifleMagazineAmmo = 30; 
 
 	
 	void FireSingleProjectile();
@@ -103,11 +104,36 @@ public:
 	int RifleAmmoUse;
 	int RifleAmmoDamage;
 
+	//shotgun Variables
+	int ShotgunAmmoUse;
+	int ShotgunAmmoDamage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int MaxShotgunInventoryAmmo;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int ShotgunMaxAmmo = 30;
+
+	// Useable ammo in the magazine.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int ShotgunMagazineAmmo;
+	// Max Ammo in a magazine, 30.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ammo")
+		int MaxDefaultShotgunMagazineAmmo = 8;
+
+	bool bHasShotgunMagAmmo;
+	bool bHasShotgunInvAmmo;
+
 	// Check Current Ammo.
-	bool bHasMagAmmo;
-	bool bHasInvAmmo;
+	bool bHasRifleMagAmmo;
+	bool bHasRifleInvAmmo;
 	//bool bHasAmmo; 
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void RifleHud();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void ShotgunHud();
 
 	// Check Status of Weapon.
 	bool bIsReloading;
@@ -144,11 +170,11 @@ public:
 		void CheckAmmoPickup(int Ammo);
 		// Depletion of Ammo stock.
 		void UseAmmo();
+		void ShotgunUseAmmo();
 
 		// Reload Magazine (R).
 		void ManualReload();
-		// Reload Magazine (AU)
-		//void AutomaticReload();
+		void ManualShotgunReload();
 
 	
 
@@ -190,6 +216,8 @@ public:
 		int ZoomRunSpeed;
 		int ZoomCrouchSpeed;
 
+		//void ShotgunDelay();
+		//int ShotgunTracker; 
 		
 
 
@@ -229,6 +257,9 @@ public:
 
 	// Timer Function
 	void ResetFire();
+	void ResetShotgunFire();
+
+	FTimerHandle ShotgunDelay;
 
 	// Handles Delay inbetween shots.
 	FTimerHandle FireDelayTimerHandle;
